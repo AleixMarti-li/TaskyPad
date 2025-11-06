@@ -1,0 +1,175 @@
+﻿<Window x:Class="TaskyPad.EditorNota"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Editar Nota"
+        MinHeight="400" MinWidth="700"
+        WindowStartupLocation="CenterScreen"
+        Background="#F5F5F5">
+
+    <DockPanel LastChildFill="True">
+        <!-- ======= Barra de herramientas superior ======= -->
+        <Border DockPanel.Dock="Top" 
+                Background="White" 
+                BorderBrush="#E0E0E0" 
+                BorderThickness="0,0,0,1"
+                Padding="12,8">
+
+            <DockPanel LastChildFill="False">
+                <!-- Herramientas de formato a la izquierda -->
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                    <!-- Formato de texto -->
+                    <ToggleButton Name="BtnBold" 
+                                  Content="B" 
+                                  FontWeight="Bold" 
+                                  FontSize="14"
+                                  Click="BtnBold_Click" 
+                                  Width="36" Height="36"
+                                  Margin="0,0,4,0"
+                                  Background="Transparent"
+                                  BorderBrush="#CCCCCC"
+                                  BorderThickness="1"
+                                  Cursor="Hand"/>
+
+                    <ToggleButton Name="BtnItalic" 
+                                  Content="I" 
+                                  FontStyle="Italic" 
+                                  FontSize="14"
+                                  Click="BtnItalic_Click" 
+                                  Width="36" Height="36"
+                                  Margin="0,0,4,0"
+                                  Background="Transparent"
+                                  BorderBrush="#CCCCCC"
+                                  BorderThickness="1"
+                                  Cursor="Hand"/>
+
+                    <ToggleButton Name="BtnUnderline" 
+                                  Content="U" 
+                                  FontSize="14"
+                                  Click="BtnUnderline_Click" 
+                                  Width="36" Height="36"
+                                  Margin="0,0,16,0"
+                                  Background="Transparent"
+                                  BorderBrush="#CCCCCC"
+                                  BorderThickness="1"
+                                  Cursor="Hand"/>
+
+                    <!-- Separador visual -->
+                    <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" 
+                               Margin="0,4,16,4"/>
+
+                    <!-- Tamaño de fuente -->
+                    <ComboBox Name="FontSizeBox" 
+                              Width="75" Height="36"
+                              SelectionChanged="FontSizeBox_SelectionChanged" 
+                              Margin="0,0,8,0"
+                              VerticalContentAlignment="Center"
+                              BorderBrush="#CCCCCC">
+                        <ComboBoxItem>12</ComboBoxItem>
+                        <ComboBoxItem>14</ComboBoxItem>
+                        <ComboBoxItem>18</ComboBoxItem>
+                        <ComboBoxItem>24</ComboBoxItem>
+                        <ComboBoxItem>36</ComboBoxItem>
+                    </ComboBox>
+
+                    <!-- Familia de fuente -->
+                    <ComboBox Name="FontFamilyBox" 
+                              Width="160" Height="36"
+                              SelectionChanged="FontFamilyBox_SelectionChanged"
+                              VerticalContentAlignment="Center"
+                              BorderBrush="#CCCCCC">
+                        <ComboBoxItem>Arial</ComboBoxItem>
+                        <ComboBoxItem>Calibri</ComboBoxItem>
+                        <ComboBoxItem>Consolas</ComboBoxItem>
+                        <ComboBoxItem>Times New Roman</ComboBoxItem>
+                    </ComboBox>
+                </StackPanel>
+
+                <!-- Botones de acción a la derecha -->
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                    <!-- Botón Guardar -->
+                    <Button Content="💾 Guardar"
+                            Width="120" Height="36"
+                            Margin="0,0,12,0"
+                            Background="#4CAF50"
+                            Foreground="White"
+                            BorderThickness="0"
+                            FontWeight="SemiBold"
+                            FontSize="13"
+                            Cursor="Hand"
+                            Click="BtnGuardar">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}"
+                                                    CornerRadius="4"
+                                                    Padding="12,0">
+                                                <ContentPresenter HorizontalAlignment="Center" 
+                                                                  VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#45A049"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+
+                    <!-- Botón Eliminar (icono de basura) -->
+                    <Button Content="🗑️"
+                            Width="36" Height="36"
+                            Background="#E53935"
+                            Foreground="White"
+                            BorderThickness="0"
+                            FontSize="16"
+                            Cursor="Hand"
+                            Click="BtnEliminar"
+                            ToolTip="Eliminar nota">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}"
+                                                    CornerRadius="4">
+                                                <ContentPresenter HorizontalAlignment="Center" 
+                                                                  VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#D32F2F"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- ======= Área de edición ======= -->
+        <Border Margin="15" 
+                Background="White"
+                BorderBrush="#E0E0E0"
+                BorderThickness="1"
+                CornerRadius="4">
+            <RichTextBox x:Name="NotaTextBox"
+                         AcceptsReturn="True"
+                         FontSize="15"
+                         FontFamily="Segoe UI"
+                         VerticalScrollBarVisibility="Auto"
+                         Background="Transparent"
+                         BorderThickness="0"
+                         Padding="16"
+                         SelectionChanged="NotaTextBox_SelectionChanged"/>
+        </Border>
+    </DockPanel>
+</Window>

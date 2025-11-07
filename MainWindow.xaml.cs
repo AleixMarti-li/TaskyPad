@@ -1,7 +1,13 @@
 ﻿using Microsoft.VisualBasic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Reflection;
+using System.Runtime.InteropServices.JavaScript;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -24,6 +30,7 @@ namespace TaskyPad
         public MainWindow()
         {
             InitializeComponent();
+            AddVersionAppUI();
             RecuperarNotas();
             LoadTareas();
         }
@@ -127,6 +134,14 @@ namespace TaskyPad
                 //card.Padding = new Thickness(8);
                 //card.CornerRadius = new CornerRadius(5);
 
+                ContextMenu contextMenu = new ContextMenu();
+                MenuItem MenuItem = new MenuItem();
+                MenuItem.Header = "Eliminar";
+                MenuItem.Icon = "🗑️";
+                MenuItem.Click += (s, e) => BorrarTarea(item);
+                contextMenu.Items.Add(MenuItem);
+                card.ContextMenu = contextMenu;
+
                 // Título
                 Label lblTitulo = new Label();
                 lblTitulo.Content = item.titulo;
@@ -140,9 +155,13 @@ namespace TaskyPad
                 Label lblTiempo = new Label();
                 lblTiempo.Content = item.fecha.ToString("dd-MM-yyyy HH:mm");
                 TimeSpan diferencia = item.fecha - DateTime.Now;
-                if (diferencia.TotalHours <= 24 && diferencia.TotalHours > 0) 
+                if (diferencia.TotalHours <= 24 && diferencia.TotalHours > 0)
                 {
-                    lblTiempo.Background = new SolidColorBrush(Color.FromRgb(255, 0 , 0 ));
+                    lblTiempo.Background = new SolidColorBrush(Color.FromRgb(255, 0, 0));
+                } 
+                else if (diferencia.TotalHours <= 72 && diferencia.TotalHours > 0) 
+                {
+                    lblTiempo.Background = new SolidColorBrush(Color.FromRgb(255, 255, 0));
                 }
 
                 // ComboBox del estado
@@ -153,6 +172,12 @@ namespace TaskyPad
                 comboEstado.Items.Add("In Progress");
                 comboEstado.Items.Add("Done");
                 comboEstado.SelectedItem = item.estado.ToString();
+
+                Button eliminarTarea = new Button();
+                card.Margin = new Thickness(10,5,0,0);
+                eliminarTarea.Width = 60;
+                eliminarTarea.Content = "🗑️";
+                eliminarTarea.Click += (s, e) => BorrarTarea(item);
 
                 // Evento al cambiar estado
                 comboEstado.SelectionChanged += (s, e) =>
@@ -181,15 +206,30 @@ namespace TaskyPad
                         break;
                     case EstadoTarea.Done:
                         PanelTareasDone.Children.Add(card);
+                        card.Children.Add(eliminarTarea);
                         break;
                 }
             }
+        }
+
+        private void BorrarTarea(Tarea tareaEliminada) 
+        {
+            MessageBoxResult eliminarTarea = MessageBox.Show($"Estas seguro de eliminar la tarea de {tareaEliminada.titulo}? esta accion no se puede deshacer", "Advertencia", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            if (eliminarTarea != MessageBoxResult.Yes) return;
+            _listaTareas.Remove(tareaEliminada);
+            SaveJSONTarea();
         }
 
         private void CambiarEstadoTarea(Tarea item, EstadoTarea nuevoEstado)
         {
             item.estado = nuevoEstado;
             RecuperarTareasUI(); // refrescamos la UI
+        }
+
+        private void AddVersionAppUI() 
+        {
+            string getVersionAssembly = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            versionApp.Content = $"Version {getVersionAssembly}";
         }
     }
 }

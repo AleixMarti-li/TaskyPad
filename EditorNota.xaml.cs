@@ -37,7 +37,7 @@ namespace TaskyPad
 
         private void BtnEliminar(object sender, RoutedEventArgs e)
         {
-           MessageBoxResult eliminarNota = MessageBox.Show($"Estas seguro de eliminar la nota de {_nombreNota}? esta accion no se puede deshacer", "Advertencia", MessageBoxButton.YesNo,MessageBoxImage.Warning);
+           MessageBoxResult eliminarNota = System.Windows.MessageBox.Show($"Estas seguro de eliminar la nota de {_nombreNota}? esta accion no se puede deshacer", "Advertencia", MessageBoxButton.YesNo,MessageBoxImage.Warning);
             if (eliminarNota == MessageBoxResult.No) return;
             string path = $"notas/{_nombreNota}.txt";
             File.Delete(path);
@@ -50,7 +50,7 @@ namespace TaskyPad
             TextRange texto = new TextRange(NotaTextBox.Document.ContentStart, NotaTextBox.Document.ContentEnd);
             using (FileStream fs = new FileStream($"notas/{_nombreNota}.txt", FileMode.Create))
             {
-                texto.Save(fs, DataFormats.Rtf);
+                texto.Save(fs, System.Windows.Forms.DataFormats.Rtf);
             }
             this.Close();
         }
@@ -61,7 +61,7 @@ namespace TaskyPad
             TextRange texto = new TextRange(NotaTextBox.Document.ContentStart, NotaTextBox.Document.ContentEnd);
             using (FileStream fs = new FileStream($"notas/{_nombreNota}.txt", FileMode.Open))
             {
-                texto.Load(fs, DataFormats.Rtf);
+                texto.Load(fs, System.Windows.Forms.DataFormats.Rtf);
             }
         }
 
@@ -89,7 +89,7 @@ namespace TaskyPad
         private void FontFamilyBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (FontFamilyBox.SelectedItem is ComboBoxItem item)
-                NotaTextBox.Selection.ApplyPropertyValue(TextElement.FontFamilyProperty, new FontFamily(item.Content.ToString()));
+                NotaTextBox.Selection.ApplyPropertyValue(TextElement.FontFamilyProperty, new System.Windows.Media.FontFamily(item.Content.ToString()));
         }
 
         private void NotaTextBox_SelectionChanged(object sender, RoutedEventArgs e)

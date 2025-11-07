@@ -17,6 +17,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Forms;
+using System.Drawing;
 
 namespace TaskyPad
 {
@@ -62,7 +64,7 @@ namespace TaskyPad
             foreach (var item in _listaNotas)
             {
                 string fileName = System.IO.Path.GetFileNameWithoutExtension(item);
-                Button Btnpepe = new Button();
+                System.Windows.Controls.Button Btnpepe = new System.Windows.Controls.Button();
                 Btnpepe.Content = fileName;
                 Btnpepe.Margin = new Thickness(5);
                 Btnpepe.Click += BtnNota_Click;
@@ -129,13 +131,13 @@ namespace TaskyPad
                 // Contenedor de la tarjeta de la tarea
                 StackPanel card = new StackPanel();
                 card.Margin = new Thickness(5);
-                card.Orientation = Orientation.Vertical;
-                card.Background = new SolidColorBrush(Color.FromRgb(235, 235, 235));
+                card.Orientation = System.Windows.Controls.Orientation.Vertical;
+                card.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(235, 235, 235));
                 //card.Padding = new Thickness(8);
                 //card.CornerRadius = new CornerRadius(5);
 
-                ContextMenu contextMenu = new ContextMenu();
-                MenuItem MenuItem = new MenuItem();
+                System.Windows.Controls.ContextMenu contextMenu = new System.Windows.Controls.ContextMenu();
+                System.Windows.Controls.MenuItem MenuItem = new System.Windows.Controls.MenuItem();
                 MenuItem.Header = "Eliminar";
                 MenuItem.Icon = "🗑️";
                 MenuItem.Click += (s, e) => BorrarTarea(item);
@@ -143,29 +145,29 @@ namespace TaskyPad
                 card.ContextMenu = contextMenu;
 
                 // Título
-                Label lblTitulo = new Label();
+                System.Windows.Controls.Label lblTitulo = new System.Windows.Controls.Label();
                 lblTitulo.Content = item.titulo;
                 lblTitulo.FontWeight = FontWeights.Bold;
 
                 // Subtítulo
-                Label lblSubtitulo = new Label();
+                System.Windows.Controls.Label lblSubtitulo = new System.Windows.Controls.Label();
                 lblSubtitulo.Content = item.descripcion;
 
                 // Tiempo
-                Label lblTiempo = new Label();
+                System.Windows.Controls.Label lblTiempo = new System.Windows.Controls.Label();
                 lblTiempo.Content = item.fecha.ToString("dd-MM-yyyy HH:mm");
                 TimeSpan diferencia = item.fecha - DateTime.Now;
                 if (diferencia.TotalHours <= 24 && diferencia.TotalHours > 0)
                 {
-                    lblTiempo.Background = new SolidColorBrush(Color.FromRgb(255, 0, 0));
+                    lblTiempo.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 0, 0));
                 } 
                 else if (diferencia.TotalHours <= 72 && diferencia.TotalHours > 0) 
                 {
-                    lblTiempo.Background = new SolidColorBrush(Color.FromRgb(255, 255, 0));
+                    lblTiempo.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 255, 0));
                 }
 
                 // ComboBox del estado
-                ComboBox comboEstado = new ComboBox();
+                System.Windows.Controls.ComboBox comboEstado = new System.Windows.Controls.ComboBox();
                 comboEstado.Margin = new Thickness(0, 5, 0, 0);
                 comboEstado.Width = 120;
                 comboEstado.Items.Add("None");
@@ -173,7 +175,7 @@ namespace TaskyPad
                 comboEstado.Items.Add("Done");
                 comboEstado.SelectedItem = item.estado.ToString();
 
-                Button eliminarTarea = new Button();
+                System.Windows.Controls.Button eliminarTarea = new System.Windows.Controls.Button();
                 card.Margin = new Thickness(10,5,0,0);
                 eliminarTarea.Width = 60;
                 eliminarTarea.Content = "🗑️";
@@ -214,7 +216,7 @@ namespace TaskyPad
 
         private void BorrarTarea(Tarea tareaEliminada) 
         {
-            MessageBoxResult eliminarTarea = MessageBox.Show($"Estas seguro de eliminar la tarea de {tareaEliminada.titulo}? esta accion no se puede deshacer", "Advertencia", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            MessageBoxResult eliminarTarea = System.Windows.MessageBox.Show($"Estas seguro de eliminar la tarea de {tareaEliminada.titulo}? esta accion no se puede deshacer", "Advertencia", MessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (eliminarTarea != MessageBoxResult.Yes) return;
             _listaTareas.Remove(tareaEliminada);
             SaveJSONTarea();

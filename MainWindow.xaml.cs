@@ -1,7 +1,10 @@
 ﻿using Microsoft.VisualBasic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.JavaScript;
 using System.Text;
 using System.Text.Json;
@@ -12,13 +15,12 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.Windows.Forms;
-using System.Drawing;
 
 namespace TaskyPad
 {
@@ -61,6 +63,7 @@ namespace TaskyPad
                 this.Show();
                 this.WindowState = WindowState.Normal;
                 this.ShowInTaskbar = true;
+                this.Activate();
             });
             _TrayIcon.ContextMenuStrip = new ContextMenuStrip();
             _TrayIcon.ContextMenuStrip.Items.Add("Salir", null, (s, e) =>

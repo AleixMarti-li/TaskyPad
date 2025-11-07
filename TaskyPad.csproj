@@ -14,4 +14,10 @@
     <PackageReference Include="Extended.Wpf.Toolkit" Version="5.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="logo.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

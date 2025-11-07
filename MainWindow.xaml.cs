@@ -29,12 +29,50 @@ namespace TaskyPad
     {
         private string[] _listaNotas = new string[0]; 
         private List<Tarea> _listaTareas = new List<Tarea>();
+        private NotifyIcon _TrayIcon;
         public MainWindow()
         {
             InitializeComponent();
+            loadTrayIcon();
             AddVersionAppUI();
             RecuperarNotas();
             LoadTareas();
+        }
+
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+#if !DEBUG
+            e.Cancel = true;
+            this.Hide();
+            this.ShowInTaskbar = false;
+            _TrayIcon.Visible = true;
+#endif
+        }
+
+        private void loadTrayIcon() 
+        {
+            _TrayIcon = new NotifyIcon();
+            _TrayIcon.Visible = false;
+            _TrayIcon.Text = "TaskyPad";
+            _TrayIcon.Icon = new Icon("logo.ico");
+            _TrayIcon.ContextMenuStrip = new ContextMenuStrip();
+            _TrayIcon.ContextMenuStrip.Items.Add("Abrir", null, (s, e) =>
+            {
+                this.Show();
+                this.WindowState = WindowState.Normal;
+                this.ShowInTaskbar = true;
+            });
+            _TrayIcon.ContextMenuStrip = new ContextMenuStrip();
+            _TrayIcon.ContextMenuStrip.Items.Add("Salir", null, (s, e) =>
+            {
+                _TrayIcon.Visible = false;
+                System.Windows.Application.Current.Shutdown();
+            });
+            _TrayIcon.DoubleClick += (s, e) =>
+            {
+                this.Show();
+                this.WindowState = WindowState.Normal;
+            };
         }
 
         private void BtnCrearNotas_Click(object sender, RoutedEventArgs e)

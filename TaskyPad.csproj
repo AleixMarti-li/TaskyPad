@@ -11,7 +11,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ApplicationDefinition Remove="App.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="AssemblyInfo.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Extended.Wpf.Toolkit" Version="5.0.0" />
+    <PackageReference Include="Velopack" Version="0.0.1298" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Include="AssemblyInfo.cs" />
   </ItemGroup>
 
   <ItemGroup>

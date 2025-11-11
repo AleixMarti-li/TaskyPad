@@ -5,6 +5,7 @@ using System.IO.Pipes;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
+using Velopack;
 
 namespace TaskyPad
 {
@@ -13,6 +14,15 @@ namespace TaskyPad
     /// </summary>
     public partial class App : System.Windows.Application
     {
+
+        [STAThread]
+        private static void Main(string[] args)
+        {
+            VelopackApp.Build().Run();
+            App app = new();
+            app.Run();
+        }
+
         private static Mutex? mutex;
         private static NamedPipeServerStream? pipeServer;
         private const string PipeName = "TaskyPadAppPipe";

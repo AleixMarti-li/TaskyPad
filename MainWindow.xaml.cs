@@ -143,7 +143,9 @@ namespace TaskyPad
 
         private void BtnNota_Click(object sender, RoutedEventArgs e)
         {
-            string nombre = ((System.Windows.Controls.ContentControl)sender).Content.ToString();
+            string contenido = ((System.Windows.Controls.ContentControl)sender).Content.ToString();
+            // Remover el emoji "📄 " del nombre
+            string nombre = contenido.Replace("📄 ", "").Trim();
             EditorNota ventanaEditor = new EditorNota(nombre, this);
             ventanaEditor.Title = $"Editando la nota - {nombre}";
             ventanaEditor.ShowDialog();

@@ -145,7 +145,7 @@
                        Foreground="White" 
                        HorizontalAlignment="Left"
                        FontSize="11"/>
-                <TextBlock Text="© 2024 - Aleix Marti" 
+                <TextBlock Text="© 2025 - Aleix Marti" 
                           Foreground="White" 
                           HorizontalAlignment="Right"
                           VerticalAlignment="Center"

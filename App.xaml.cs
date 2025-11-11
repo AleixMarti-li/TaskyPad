@@ -20,6 +20,7 @@ namespace TaskyPad
         {
             VelopackApp.Build().Run();
             App app = new();
+            app.InitializeComponent();
             app.Run();
         }
 

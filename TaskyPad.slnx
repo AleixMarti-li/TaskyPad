@@ -1,3 +1,7 @@
 <Solution>
+  <Folder Name="/.github/" />
+  <Folder Name="/.github/workflows/">
+    <File Path="velopack.yml" />
+  </Folder>
   <Project Path="TaskyPad.csproj" />
 </Solution>

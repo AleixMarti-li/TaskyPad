@@ -5,16 +5,152 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TaskyPad"
         mc:Ignorable="d"
-        Title="MainWindow" Height="1001" Width="932">
+        Title="TaskyPad" Height="1000" Width="1200" Background="#FFF5F5F5">
     <Grid>
-        <Label Content="JOEL GORDO" HorizontalAlignment="Left" Margin="347,338,0,0" VerticalAlignment="Top" Cursor="Pen" Height="35" Width="119"/>
-        <Button x:Name="BtnCrearNotas" Content="CREAR NOTA" HorizontalAlignment="Left" Margin="315,245,0,0" VerticalAlignment="Top" Height="88" Width="216" Background="#FFC76D6D" Click="BtnCrearNotas_Click"/>
-        <StackPanel x:Name="PanelNotas" Margin="0,0,631,59"/>
-        <Button x:Name="CrearTarea" Content="Nueva tarea" HorizontalAlignment="Left" Margin="355,441,0,0" VerticalAlignment="Top" Click="CrearTarea_Click"/>
-        <StackPanel x:Name="PanelTareasNone" Margin="621,0,10,706" Background="#FFD0D0D0"/>
-        <StackPanel x:Name="PanelTareasInProgress" Margin="621,284,10,348" Background="#FFBD5C5C"/>
-        <StackPanel x:Name="PanelTareasDone" Margin="621,642,10,10" Background="#FF4AAF35"/>
-        <Label x:Name="versionApp" Content="Label" HorizontalAlignment="Left" Margin="24,926,0,0" VerticalAlignment="Top" Width="126"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
+        <!-- Header -->
+        <Border Grid.Row="0" Background="#FF2D3E50" Height="80" Padding="30,0">
+            <Grid VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- Título de la app -->
+                <TextBlock Grid.Column="0" 
+                           Text="📝 TaskyPad" 
+                           FontSize="36" 
+                           FontWeight="Bold" 
+                           Foreground="White"
+                           VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+
+        <!-- Contenido principal -->
+        <Grid Grid.Row="1" Margin="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.4*"/>
+                <ColumnDefinition Width="0.6*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Panel izquierdo - Notas -->
+            <StackPanel Grid.Column="0" Margin="0,0,15,0">
+                <TextBlock Text="MIS NOTAS" 
+                          FontSize="20" 
+                          FontWeight="Bold" 
+                          Foreground="#FF2D3E50"
+                          Margin="0,0,0,15"/>
+                
+                <Button x:Name="BtnCrearNotas" 
+                       Content="+ CREAR NOTA" 
+                       HorizontalAlignment="Stretch"
+                       Height="50" 
+                       Background="#FF3498DB" 
+                       Foreground="White"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Cursor="Hand"
+                       Click="BtnCrearNotas_Click"
+                       Style="{StaticResource {x:Type Button}}"/>
+                
+                <Border CornerRadius="8" Background="White" Margin="0,15,0,0" Padding="10">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="600">
+                        <StackPanel x:Name="PanelNotas"/>
+                    </ScrollViewer>
+                </Border>
+            </StackPanel>
+
+            <!-- Panel derecho - Tareas -->
+            <StackPanel Grid.Column="1" Margin="15,0,0,0">
+                <TextBlock Text="GESTOR DE TAREAS" 
+                          FontSize="20" 
+                          FontWeight="Bold" 
+                          Foreground="#FF2D3E50"
+                          Margin="0,0,0,15"/>
+                
+                <Button x:Name="CrearTarea" 
+                       Content="+ NUEVA TAREA" 
+                       HorizontalAlignment="Stretch"
+                       Height="50" 
+                       Background="#FF27AE60" 
+                       Foreground="White"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Cursor="Hand"
+                       Click="CrearTarea_Click"/>
+
+                <!-- Contenedor de tareas en columnas -->
+                <Grid Margin="0,15,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Panel Ninguna -->
+                    <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                        <TextBlock Text="📋 POR HACER" 
+                                  FontSize="14" 
+                                  FontWeight="Bold" 
+                                  Foreground="#FF7F8C8D"
+                                  Margin="0,0,0,10"/>
+                        <Border CornerRadius="8" Background="White" Padding="10" BorderThickness="1" BorderBrush="#FFE0E0E0">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="650">
+                                <StackPanel x:Name="PanelTareasNone"/>
+                            </ScrollViewer>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Panel En Progreso -->
+                    <StackPanel Grid.Column="1" Margin="8,0">
+                        <TextBlock Text="⏳ EN PROGRESO" 
+                                  FontSize="14" 
+                                  FontWeight="Bold" 
+                                  Foreground="#FFF39C12"
+                                  Margin="0,0,0,10"/>
+                        <Border CornerRadius="8" Background="White" Padding="10" BorderThickness="1" BorderBrush="#FFE0E0E0">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="650">
+                                <StackPanel x:Name="PanelTareasInProgress"/>
+                            </ScrollViewer>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Panel Completadas -->
+                    <StackPanel Grid.Column="2" Margin="8,0,0,0">
+                        <TextBlock Text="✓ COMPLETADAS" 
+                                  FontSize="14" 
+                                  FontWeight="Bold" 
+                                  Foreground="#FF27AE60"
+                                  Margin="0,0,0,10"/>
+                        <Border CornerRadius="8" Background="White" Padding="10" BorderThickness="1" BorderBrush="#FFE0E0E0">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="650">
+                                <StackPanel x:Name="PanelTareasDone"/>
+                            </ScrollViewer>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+        </Grid>
+
+        <!-- Footer -->
+        <Border Grid.Row="2" Background="#FF34495E" Height="50" Padding="30,0">
+            <Grid VerticalAlignment="Center">
+                <Label x:Name="versionApp" 
+                       Content="Version" 
+                       Foreground="White" 
+                       HorizontalAlignment="Left"
+                       FontSize="11"/>
+                <TextBlock Text="© 2024 - Aleix Marti" 
+                          Foreground="White" 
+                          HorizontalAlignment="Right"
+                          VerticalAlignment="Center"
+                          FontSize="11"/>
+            </Grid>
+        </Border>
     </Grid>
 </Window>

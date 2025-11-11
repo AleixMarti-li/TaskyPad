@@ -108,11 +108,36 @@ namespace TaskyPad
             foreach (var item in _listaNotas)
             {
                 string fileName = System.IO.Path.GetFileNameWithoutExtension(item);
-                System.Windows.Controls.Button Btnpepe = new System.Windows.Controls.Button();
-                Btnpepe.Content = fileName;
-                Btnpepe.Margin = new Thickness(5);
-                Btnpepe.Click += BtnNota_Click;
-                PanelNotas.Children.Add(Btnpepe);
+                
+                // Border para estilo mejorado
+                Border notaBorder = new Border();
+                notaBorder.CornerRadius = new CornerRadius(6);
+                notaBorder.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(52, 152, 219));
+                notaBorder.Margin = new Thickness(0, 0, 0, 8);
+                notaBorder.Padding = new Thickness(2);
+                
+                var shadowEffect = new System.Windows.Media.Effects.DropShadowEffect
+                {
+                    BlurRadius = 3,
+                    ShadowDepth = 1,
+                    Opacity = 0.1,
+                    Color = System.Windows.Media.Colors.Black
+                };
+                notaBorder.Effect = shadowEffect;
+
+                System.Windows.Controls.Button btnNota = new System.Windows.Controls.Button();
+                btnNota.Content = "📄 " + fileName;
+                btnNota.Padding = new Thickness(10, 12, 10, 12);
+                btnNota.Foreground = new SolidColorBrush(System.Windows.Media.Colors.White);
+                btnNota.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(52, 152, 219));
+                btnNota.BorderThickness = new Thickness(0);
+                btnNota.FontSize = 12;
+                btnNota.FontWeight = FontWeights.Medium;
+                btnNota.Cursor = System.Windows.Input.Cursors.Hand;
+                btnNota.Click += BtnNota_Click;
+
+                notaBorder.Child = btnNota;
+                PanelNotas.Children.Add(notaBorder);
             }
         }
 
@@ -172,58 +197,95 @@ namespace TaskyPad
 
             foreach (var item in _listaTareas)
             {
-                // Contenedor de la tarjeta de la tarea
-                StackPanel card = new StackPanel();
-                card.Margin = new Thickness(5);
-                card.Orientation = System.Windows.Controls.Orientation.Vertical;
-                card.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(235, 235, 235));
-                //card.Padding = new Thickness(8);
-                //card.CornerRadius = new CornerRadius(5);
+                // Contenedor de la tarjeta de la tarea con estilo mejorado
+                Border cardBorder = new Border();
+                cardBorder.CornerRadius = new CornerRadius(8);
+                cardBorder.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 255, 255));
+                cardBorder.BorderThickness = new Thickness(1);
+                cardBorder.BorderBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(220, 220, 220));
+                cardBorder.Margin = new Thickness(0, 0, 0, 10);
+                cardBorder.Padding = new Thickness(12);
 
+                // Efecto de sombra
+                var shadowEffect = new System.Windows.Media.Effects.DropShadowEffect
+                {
+                    BlurRadius = 4,
+                    ShadowDepth = 2,
+                    Opacity = 0.15,
+                    Color = System.Windows.Media.Colors.Black
+                };
+                cardBorder.Effect = shadowEffect;
+
+                StackPanel card = new StackPanel();
+                card.Orientation = System.Windows.Controls.Orientation.Vertical;
+
+                // Context Menu
                 System.Windows.Controls.ContextMenu contextMenu = new System.Windows.Controls.ContextMenu();
                 System.Windows.Controls.MenuItem MenuItem = new System.Windows.Controls.MenuItem();
                 MenuItem.Header = "Eliminar";
-                MenuItem.Icon = "🗑️";
                 MenuItem.Click += (s, e) => BorrarTarea(item);
                 contextMenu.Items.Add(MenuItem);
-                card.ContextMenu = contextMenu;
+                cardBorder.ContextMenu = contextMenu;
 
-                // Título
-                System.Windows.Controls.Label lblTitulo = new System.Windows.Controls.Label();
-                lblTitulo.Content = item.titulo;
+                // Título - Más grande y destacado
+                TextBlock lblTitulo = new TextBlock();
+                lblTitulo.Text = item.titulo;
                 lblTitulo.FontWeight = FontWeights.Bold;
+                lblTitulo.FontSize = 14;
+                lblTitulo.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(45, 62, 80));
+                lblTitulo.Margin = new Thickness(0, 0, 0, 5);
 
-                // Subtítulo
-                System.Windows.Controls.Label lblSubtitulo = new System.Windows.Controls.Label();
-                lblSubtitulo.Content = item.descripcion;
+                // Subtítulo - Descripción con estilo
+                TextBlock lblSubtitulo = new TextBlock();
+                lblSubtitulo.Text = item.descripcion;
+                lblSubtitulo.FontSize = 12;
+                lblSubtitulo.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(127, 140, 141));
+                lblSubtitulo.Margin = new Thickness(0, 0, 0, 8);
+                lblSubtitulo.TextWrapping = TextWrapping.Wrap;
 
-                // Tiempo
-                System.Windows.Controls.Label lblTiempo = new System.Windows.Controls.Label();
-                lblTiempo.Content = item.fecha.ToString("dd-MM-yyyy HH:mm");
+                // Tiempo - Con colores según urgencia
+                Border timeBorder = new Border();
+                timeBorder.CornerRadius = new CornerRadius(4);
+                timeBorder.Padding = new Thickness(8, 6, 8, 6);
+                timeBorder.Margin = new Thickness(0, 0, 0, 8);
+                
+                TextBlock lblTiempo = new TextBlock();
+                lblTiempo.Text = item.fecha.ToString("dd-MM-yyyy HH:mm");
+                lblTiempo.FontSize = 11;
+                lblTiempo.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 255, 255));
+                
                 TimeSpan diferencia = item.fecha - DateTime.Now;
                 if (diferencia.TotalHours <= 24 && diferencia.TotalHours > 0)
                 {
-                    lblTiempo.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 0, 0));
+                    timeBorder.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(231, 76, 60)); // Rojo urgente
+                    lblTiempo.Text = "🔴 " + lblTiempo.Text + " - ¡URGENTE!";
                 } 
                 else if (diferencia.TotalHours <= 72 && diferencia.TotalHours > 0) 
                 {
-                    lblTiempo.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 255, 0));
+                    timeBorder.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(241, 196, 15)); // Amarillo
+                    lblTiempo.Text = "🟡 " + lblTiempo.Text;
+                }
+                else if (diferencia.TotalHours <= 0)
+                {
+                    timeBorder.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(192, 192, 192)); // Gris vencido
+                    lblTiempo.Text = "⚠️ " + lblTiempo.Text + " - VENCIDA";
+                }
+                else
+                {
+                    timeBorder.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(52, 152, 219)); // Azul
                 }
 
-                // ComboBox del estado
+                timeBorder.Child = lblTiempo;
+
+                // ComboBox del estado con estilo mejorado
                 System.Windows.Controls.ComboBox comboEstado = new System.Windows.Controls.ComboBox();
-                comboEstado.Margin = new Thickness(0, 5, 0, 0);
-                comboEstado.Width = 120;
+                comboEstado.Margin = new Thickness(0, 8, 0, 0);
+                comboEstado.Padding = new Thickness(8, 6, 8, 6);
+                comboEstado.FontSize = 11;
                 comboEstado.Items.Add("None");
                 comboEstado.Items.Add("In Progress");
                 comboEstado.Items.Add("Done");
                 comboEstado.SelectedItem = item.estado.ToString();
-
-                System.Windows.Controls.Button eliminarTarea = new System.Windows.Controls.Button();
-                card.Margin = new Thickness(10,5,0,0);
-                eliminarTarea.Width = 60;
-                eliminarTarea.Content = "🗑️";
-                eliminarTarea.Click += (s, e) => BorrarTarea(item);
 
                 // Evento al cambiar estado
                 comboEstado.SelectionChanged += (s, e) =>
@@ -235,24 +297,38 @@ namespace TaskyPad
                     }
                 };
 
+                // Botón eliminar oculto hasta que la tarea esté completada
+                System.Windows.Controls.Button eliminarTarea = new System.Windows.Controls.Button();
+                eliminarTarea.Width = 100;
+                eliminarTarea.Height = 32;
+                eliminarTarea.Content = "🗑️ Eliminar";
+                eliminarTarea.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(231, 76, 60));
+                eliminarTarea.Foreground = new SolidColorBrush(System.Windows.Media.Colors.White);
+                eliminarTarea.Margin = new Thickness(0, 8, 0, 0);
+                eliminarTarea.FontSize = 11;
+                eliminarTarea.Cursor = System.Windows.Input.Cursors.Hand;
+                eliminarTarea.Click += (s, e) => BorrarTarea(item);
+
                 // Añadimos todo al panel
                 card.Children.Add(lblTitulo);
                 card.Children.Add(lblSubtitulo);
-                card.Children.Add(lblTiempo);
+                card.Children.Add(timeBorder);
                 card.Children.Add(comboEstado);
+
+                cardBorder.Child = card;
 
                 // Lo colocamos según el estado actual
                 switch (item.estado)
                 {
                     case EstadoTarea.None:
-                        PanelTareasNone.Children.Add(card);
+                        PanelTareasNone.Children.Add(cardBorder);
                         break;
                     case EstadoTarea.InProgress:
-                        PanelTareasInProgress.Children.Add(card);
+                        PanelTareasInProgress.Children.Add(cardBorder);
                         break;
                     case EstadoTarea.Done:
-                        PanelTareasDone.Children.Add(card);
                         card.Children.Add(eliminarTarea);
+                        PanelTareasDone.Children.Add(cardBorder);
                         break;
                 }
             }
@@ -275,7 +351,7 @@ namespace TaskyPad
         private void AddVersionAppUI() 
         {
             string getVersionAssembly = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            versionApp.Content = $"Version {getVersionAssembly}";
+            versionApp.Content = $"v{getVersionAssembly}";
         }
     }
 }

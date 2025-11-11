@@ -84,6 +84,7 @@ namespace TaskyPad
                 Directory.CreateDirectory("notas");
             }
             string nombreNota = Interaction.InputBox("Introduce el nombre de la nota");
+            if (string.IsNullOrEmpty(nombreNota)) return;
             File.WriteAllText($"notas\\{nombreNota}.txt", @"{\rtf1\ansi }");
             RecuperarNotas();
         }

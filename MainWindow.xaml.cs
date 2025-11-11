@@ -89,6 +89,9 @@ namespace TaskyPad
         }
 
         public void RecuperarNotas() {
+            if (!Directory.Exists("notas")) {
+                Directory.CreateDirectory("notas");
+            }
             string[] listaNotas = Directory.GetFiles("notas", "*.txt");
             _listaNotas = listaNotas;
             RecuperarNotasUI();

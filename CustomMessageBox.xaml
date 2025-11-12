@@ -1,0 +1,49 @@
+﻿<Window x:Class="TaskyPad.CustomMessageBox"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStartupLocation="CenterOwner"
+        SizeToContent="WidthAndHeight"
+        MinWidth="320"
+        MaxWidth="800"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ShowInTaskbar="False">
+    <Border CornerRadius="8" Background="White" Padding="12" 
+            BorderBrush="#DDDDDD" BorderThickness="1" >
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <!-- header -->
+                <RowDefinition Height="Auto"/>
+                <!-- contenido -->
+                <RowDefinition Height="Auto"/>
+                <!-- botones -->
+            </Grid.RowDefinitions>
+
+            <!-- Header (título y logo pequeño) -->
+            <DockPanel Grid.Row="0" Margin="0 0 0 8">
+                <Image x:Name="LogoHeader" Width="28" Height="28" Margin="0,0,8,0" Visibility="Collapsed"/>
+                <TextBlock x:Name="TxtTitle" VerticalAlignment="Center" FontWeight="SemiBold" FontSize="14"/>
+                <!-- Close -->
+                <Button DockPanel.Dock="Right" Content="✕" Width="28" Height="28" 
+                        Background="Transparent" BorderThickness="0" 
+                        Click="Close_Click" />
+            </DockPanel>
+
+            <!-- Contenido -->
+            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0 6 0 12">
+                <Image x:Name="IconImage" Width="48" Height="48" Margin="0,0,12,0" Visibility="Collapsed"/>
+                <TextBlock x:Name="TxtMessage" TextWrapping="Wrap" VerticalAlignment="Center" FontSize="13" />
+            </StackPanel>
+
+            <!-- Botones -->
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                <!-- Botones definidos desde code-behind -->
+                <Button x:Name="BtnSecondary" MinWidth="80" Height="30" Visibility="Collapsed" Click="BtnSecondary_Click"/>
+                <Button x:Name="BtnPrimary" MinWidth="80" Height="30" Visibility="Collapsed" Click="BtnPrimary_Click"/>
+                <Button x:Name="BtnExtra" MinWidth="80" Height="30" Visibility="Collapsed" Click="BtnExtra_Click"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

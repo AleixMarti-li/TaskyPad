@@ -28,6 +28,66 @@
                            FontWeight="Bold" 
                            Foreground="White"
                            VerticalAlignment="Center"/>
+
+                <Button x:Name="ButtonUpdateVersion"
+                Grid.Column="1"
+                Padding="18,10"
+                Margin="20,0,0,0"
+                Cursor="Hand" Visibility="Hidden" Click="ButtonUpdateVersion_Click">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Background" Value="#FFD4AF37"/>
+                            <!-- Dorado principal -->
+                            <Setter Property="BorderBrush" Value="#FFE1C16E"/>
+                            <!-- Dorado más claro -->
+                            <Setter Property="BorderThickness" Value="2"/>
+                            <Setter Property="Foreground" Value="#FF2D3E50"/>
+                            <Setter Property="FontSize" Value="16"/>
+                            <Setter Property="FontWeight" Value="SemiBold"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="{TemplateBinding Background}"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                        CornerRadius="12"
+                                        SnapsToDevicePixels="True">
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="8">
+                                                <!-- Icono de descarga -->
+                                                <TextBlock Text="⬇️" FontSize="18" VerticalAlignment="Center" Foreground="White" Margin="0,0,5,0"/>
+                                                <!-- Texto -->
+                                                <ContentPresenter HorizontalAlignment="Center"
+                                                          VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+
+                            <!-- Efectos visuales -->
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#FFEFD36E"/>
+                                    <!-- Dorado más brillante -->
+                                    <Setter Property="BorderBrush" Value="#FFF5E7A3"/>
+                                    <Setter Property="Effect">
+                                        <Setter.Value>
+                                            <DropShadowEffect Color="#99000000" BlurRadius="10" ShadowDepth="2"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter Property="Background" Value="#FFB89000"/>
+                                    <!-- Dorado más oscuro -->
+                                    <Setter Property="BorderBrush" Value="#FFD4AF37"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+
+                    <TextBlock x:Name="LblButtonDownloadUpdate" Text="Descargar actualización" Foreground="White"/>
+                </Button>
+
             </Grid>
         </Border>
 

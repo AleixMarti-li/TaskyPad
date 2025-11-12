@@ -21,6 +21,10 @@ namespace TaskyPad
         {
             try
             {
+#if DEBUG
+                return new returnMessageUpdateInfo(true, "DEV");
+#endif
+
                 if (updateManager is null) throw new Exception("update manager no instanciado");
                 updateInfo = await updateManager.CheckForUpdatesAsync().ConfigureAwait(true);
                 if (updateInfo is null) return new returnMessageUpdateInfo(false);
@@ -29,6 +33,33 @@ namespace TaskyPad
             catch (Exception ex)
             {
                 return new returnMessageUpdateInfo($"Error: {ex.Message}");
+            }
+        }
+
+        public async Task ForceUpdate()
+        {
+            try
+            {
+                if (updateManager is null)
+                {
+                    Debug.WriteLine("Cannot apply updates: UpdateManager is null");
+                    return;
+                }
+
+#if !DEBUG
+            if (updateInfo is null)
+            {
+                Debug.WriteLine("Cannot apply updates: update is null");
+                return;
+            }
+#endif
+
+                await updateManager.DownloadUpdatesAsync(updateInfo);
+                updateManager.ApplyUpdatesAndRestart(updateInfo);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error during update: {ex.Message}");
             }
         }
     }

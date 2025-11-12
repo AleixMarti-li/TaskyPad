@@ -21,6 +21,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Velopack;
 
 namespace TaskyPad
 {
@@ -32,6 +33,7 @@ namespace TaskyPad
         private string[] _listaNotas = new string[0]; 
         private List<Tarea> _listaTareas = new List<Tarea>();
         private NotifyIcon _TrayIcon;
+        private UpdateManager updateManager;
         private returnMessageUpdateInfo _updateManagerResponse;
         public MainWindow()
         {
@@ -40,13 +42,31 @@ namespace TaskyPad
             AddVersionAppUI();
             RecuperarNotas();
             LoadTareas();
+            
+            updateManager = new UpdateManager();
             CheckVersion();
         }
 
         private async void CheckVersion()
         {
-            UpdateManager updateManager = new UpdateManager();
             _updateManagerResponse = await updateManager.CheckActualizacionDisponible();
+
+            if (!_updateManagerResponse.updateAvaliable) return;
+
+            ButtonUpdateVersion.Visibility = Visibility.Visible;
+            ButtonUpdateVersion.Content = $"Descargar actualización ({_updateManagerResponse.version})";
+            //CustomMessageBoxResult eliminarNota = CustomMessageBox.Show(this, $"¿Seguro que quieras actualizar al a versión {_updateManagerResponse.version}?", $"Actualización {_updateManagerResponse.version}", CustomMessageBoxButton.YesNo, iconPath: "pack://application:,,,/Resources/warn.jpg", headerLogoPath: "pack://application:,,,/Resources/warn.jpg");
+            //if (eliminarNota != CustomMessageBoxResult.Yes) return;
+        }
+        private async void ButtonUpdateVersion_Click(object sender, RoutedEventArgs e)
+        {
+            CustomMessageBoxResult eliminarNota = CustomMessageBox.Show(this, $"¿Seguro que quieras actualizar al a versión {_updateManagerResponse.version}?", $"Actualización {_updateManagerResponse.version}", CustomMessageBoxButton.YesNo, iconPath: "pack://application:,,,/Resources/warn.jpg", headerLogoPath: "pack://application:,,,/Resources/warn.jpg");
+            if (eliminarNota != CustomMessageBoxResult.Yes) return;
+            ButtonUpdateVersion.IsEnabled = false;
+            ButtonUpdateVersion.Content = "Descargando actualización...";
+            await updateManager.ForceUpdate();
+            ButtonUpdateVersion.IsEnabled = true;
+            ButtonUpdateVersion.Content = $"Descargar actualización ({_updateManagerResponse.version})";
         }
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
@@ -361,8 +381,9 @@ namespace TaskyPad
 
         private void AddVersionAppUI() 
         {
-            string getVersionAssembly = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            versionApp.Content = $"v{getVersionAssembly}";
+            Version? getVersionAssembly = Assembly.GetExecutingAssembly().GetName().Version;
+            if (getVersionAssembly is null) return;
+            versionApp.Content = $"v{getVersionAssembly.Major}.{getVersionAssembly.Minor}.{getVersionAssembly.Build}";
         }
     }
 }

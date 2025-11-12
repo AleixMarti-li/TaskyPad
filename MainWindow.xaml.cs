@@ -32,6 +32,7 @@ namespace TaskyPad
         private string[] _listaNotas = new string[0]; 
         private List<Tarea> _listaTareas = new List<Tarea>();
         private NotifyIcon _TrayIcon;
+        private returnMessageUpdateInfo _updateManagerResponse;
         public MainWindow()
         {
             InitializeComponent();
@@ -39,6 +40,13 @@ namespace TaskyPad
             AddVersionAppUI();
             RecuperarNotas();
             LoadTareas();
+            CheckVersion();
+        }
+
+        private async void CheckVersion()
+        {
+            UpdateManager updateManager = new UpdateManager();
+            _updateManagerResponse = await updateManager.CheckActualizacionDisponible();
         }
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)

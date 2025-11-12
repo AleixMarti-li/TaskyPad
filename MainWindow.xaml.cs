@@ -134,6 +134,9 @@ namespace TaskyPad
 
             PanelNotas.Children.Clear();
 
+            // Mostrar u ocultar el mensaje según si hay notas
+            NoNotasMessage.Visibility = _listaNotas.Length == 0 ? Visibility.Visible : Visibility.Hidden;
+
             foreach (var item in _listaNotas)
             {
                 string fileName = System.IO.Path.GetFileNameWithoutExtension(item);

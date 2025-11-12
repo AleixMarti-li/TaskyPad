@@ -120,7 +120,17 @@
                 
                 <Border CornerRadius="8" Background="White" Margin="0,15,0,0" Padding="10">
                     <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="600">
-                        <StackPanel x:Name="PanelNotas"/>
+                        <Grid>
+                            <StackPanel x:Name="PanelNotas"/>
+                            <TextBlock x:Name="NoNotasMessage"
+                                      Text="📭 No hay notas&#x0a;&#x0a;Crea una nueva pulsando&#x0a;en el botón '+ CREAR NOTA'"
+                                      TextAlignment="Center"
+                                      FontSize="14"
+                                      Foreground="#FF95A5A6"
+                                      Margin="20"
+                                      VerticalAlignment="Center"
+                                      Visibility="Visible"/>
+                        </Grid>
                     </ScrollViewer>
                 </Border>
             </StackPanel>

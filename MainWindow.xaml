@@ -169,6 +169,14 @@
                                   FontWeight="Bold" 
                                   Foreground="#FF7F8C8D"
                                   Margin="0,0,0,10"/>
+                        <TextBlock x:Name="NoTareasPorHacerMessage"
+                                      Text="📭 No hay Tareas, Trabaja gordo"
+                                      TextAlignment="Center"
+                                      FontSize="14"
+                                      Foreground="#FF95A5A6"
+                                      Margin="20"
+                                      VerticalAlignment="Center"
+                                      Visibility="Visible"/>
                         <Border CornerRadius="8" Background="White" Padding="10" BorderThickness="1" BorderBrush="#FFE0E0E0">
                             <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="650">
                                 <StackPanel x:Name="PanelTareasNone"/>
@@ -183,6 +191,14 @@
                                   FontWeight="Bold" 
                                   Foreground="#FFF39C12"
                                   Margin="0,0,0,10"/>
+                        <TextBlock x:Name="NoTareasEnProgresoMessage"
+                                      Text="📭 No hay Tareas en progreso, Trabaja gordo"
+                                      TextAlignment="Center"
+                                      FontSize="14"
+                                      Foreground="#FF95A5A6"
+                                      Margin="20"
+                                      VerticalAlignment="Center"
+                                      Visibility="Visible"/>
                         <Border CornerRadius="8" Background="White" Padding="10" BorderThickness="1" BorderBrush="#FFE0E0E0">
                             <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="650">
                                 <StackPanel x:Name="PanelTareasInProgress"/>
@@ -197,6 +213,14 @@
                                   FontWeight="Bold" 
                                   Foreground="#FF27AE60"
                                   Margin="0,0,0,10"/>
+                        <TextBlock x:Name="NoTareasCompletadasMessage"
+                                      Text="📭 No hay Tareas completadas, Trabaja gordo"
+                                      TextAlignment="Center"
+                                      FontSize="14"
+                                      Foreground="#FF95A5A6"
+                                      Margin="20"
+                                      VerticalAlignment="Center"
+                                      Visibility="Visible"/>
                         <Border CornerRadius="8" Background="White" Padding="10" BorderThickness="1" BorderBrush="#FFE0E0E0">
                             <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="650">
                                 <StackPanel x:Name="PanelTareasDone"/>

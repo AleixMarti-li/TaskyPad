@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualBasic;
+﻿using Microsoft.Toolkit.Uwp.Notifications;
+using Microsoft.VisualBasic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Drawing;
@@ -218,7 +219,13 @@ namespace TaskyPad
             string conteindoJSON = File.ReadAllText("tareas\\tasks.json");
             if (string.IsNullOrEmpty(conteindoJSON)) return;
             List<Tarea>? tareasRecuperadas = JsonSerializer.Deserialize<List<Tarea>>(conteindoJSON);
-            if (tareasRecuperadas is null) return;
+            if (tareasRecuperadas is null) 
+            {
+                NoTareasPorHacerMessage.Visibility = Visibility.Visible;
+                NoTareasEnProgresoMessage.Visibility = Visibility.Visible;
+                NoTareasCompletadasMessage.Visibility = Visibility.Visible;
+                return;
+            }
             _listaTareas = tareasRecuperadas;
             RecuperarTareasUI();
         }
@@ -228,6 +235,17 @@ namespace TaskyPad
             PanelTareasNone.Children.Clear();
             PanelTareasInProgress.Children.Clear();
             PanelTareasDone.Children.Clear();
+
+            var tareasDivididas = new
+            {
+                None = _listaTareas.Where(t => t.estado == EstadoTarea.None).ToList(),
+                EnProgreso = _listaTareas.Where(t => t.estado == EstadoTarea.InProgress).ToList(),
+                Completada = _listaTareas.Where(t => t.estado == EstadoTarea.Done).ToList()
+            };
+
+            NoTareasPorHacerMessage.Visibility = tareasDivididas.None.Count == 0 ? Visibility.Visible : Visibility.Hidden;
+            NoTareasEnProgresoMessage.Visibility = tareasDivididas.EnProgreso.Count == 0 ? Visibility.Visible : Visibility.Hidden;
+            NoTareasCompletadasMessage.Visibility = tareasDivididas.Completada.Count == 0 ? Visibility.Visible : Visibility.Hidden;
 
             foreach (var item in _listaTareas)
             {

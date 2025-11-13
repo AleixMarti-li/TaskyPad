@@ -46,7 +46,6 @@ namespace TaskyPad
             
             updateManager = new UpdateManager();
             CheckVersion();
-            AddToast();
         }
 
         private async void CheckVersion()
@@ -294,6 +293,12 @@ namespace TaskyPad
                 MenuItem.Header = "Eliminar";
                 MenuItem.Click += (s, e) => BorrarTarea(item);
                 contextMenu.Items.Add(MenuItem);
+#if DEBUG
+                System.Windows.Controls.MenuItem MenuItemDebugNotification = new System.Windows.Controls.MenuItem();
+                MenuItemDebugNotification.Header = "Emular Notificación";
+                MenuItemDebugNotification.Click += (s, e) => SendWindowsTaskNotificacion(item);
+                contextMenu.Items.Add(MenuItemDebugNotification);
+#endif
                 cardBorder.ContextMenu = contextMenu;
 
                 // Título - Más grande y destacado
@@ -403,6 +408,25 @@ namespace TaskyPad
             }
         }
 
+        private void SendWindowsTaskNotificacion(Tarea item)
+        {
+            new ToastContentBuilder()
+                .AddArgument("taskId", item.idTarea)
+                .AddText($"Tarea Por Hacer: {item.titulo}")
+                .AddText($"{item.descripcion}")
+#if DEBUG
+                .AddText($"{item.idTarea}")
+#endif
+
+                .AddButton(new ToastButton()
+                    .SetContent("Hecho")
+                    .AddArgument("action", "done")
+                    .SetBackgroundActivation())
+
+
+                .Show();
+        }
+
         private void EditarTarea(Tarea item)
         {
             CrearTarea editorCrearTarea = new CrearTarea(this, item);
@@ -428,14 +452,6 @@ namespace TaskyPad
             Version? getVersionAssembly = Assembly.GetExecutingAssembly().GetName().Version;
             if (getVersionAssembly is null) return;
             versionApp.Content = $"v{getVersionAssembly.Major}.{getVersionAssembly.Minor}.{getVersionAssembly.Build}";
-        }
-
-        private void AddToast()
-        {
-            new ToastContentBuilder()
-            .AddText("Notificación desde C# 🚀")
-            .AddText("Hola todopoderoso Quim, esto es una prueba.")
-            .Show();
         }
     }
 }

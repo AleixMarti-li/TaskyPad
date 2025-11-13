@@ -1,11 +1,15 @@
-﻿using System.Configuration;
+﻿using Microsoft.Toolkit.Uwp.Notifications;
+using System.Configuration;
 using System.Data;
 using System.Diagnostics;
 using System.IO.Pipes;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
 using Velopack;
+using Windows.ApplicationModel.Activation;
+using Windows.Foundation.Collections;
 
 namespace TaskyPad
 {
@@ -49,6 +53,9 @@ namespace TaskyPad
                 // Si es la primera instancia, iniciamos el servidor de Named Pipe
                 IniciarServidorNamedPipe();
 
+                // Registrar el manejador de activaciones de Toast notifications
+                ToastNotificationManagerCompat.OnActivated += ToastNotificationManagerCompat_OnActivated;
+
                 base.OnStartup(e);
             }
             catch (Exception ex)
@@ -57,6 +64,68 @@ namespace TaskyPad
                 System.Windows.MessageBox.Show($"Error al iniciar la aplicación: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 System.Windows.Application.Current.Shutdown();
             }
+        }
+
+        private static void ToastNotificationManagerCompat_OnActivated(ToastNotificationActivatedEventArgsCompat e)
+        {
+            // Manejar la activación de la notificación Toast
+            try
+            {
+                ToastArguments args = ToastArguments.Parse(e.Argument);
+
+                // Obtener la entrada del usuario (cuadros de texto, selecciones de menú)
+                ValueSet userInput = e.UserInput;
+
+                Debug.WriteLine($"Toast notification activated with argument: {e.Argument}");
+
+                // TODO: Mostrar el contenido correspondiente basado en los argumentos
+                // Por ejemplo, si tienes un taskId en los argumentos, puedes navegar a esa tarea
+                string taskId = string.Empty;
+                string action = string.Empty;
+                if (args.Contains("taskId"))
+                {
+                    taskId = args["taskId"];
+                    Debug.WriteLine($"Task clicked: {taskId}");
+                }
+
+                if (args.Contains("action"))
+                {
+                    action = args["action"];
+                    Debug.WriteLine($"action: {action}");
+                    new TaskService().ExecuteAction(taskId, action);
+                }
+
+                if (!(string.IsNullOrEmpty(taskId)) && (string.IsNullOrEmpty(action)))
+                {
+                    CallDispatchShowProgram();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error manejando activación de Toast: {ex.Message}");
+            }
+        }
+
+        private static void CallDispatchShowProgram()
+        {
+            Current?.Dispatcher?.Invoke(() =>
+            {
+                try
+                {
+                    if (Current?.MainWindow is MainWindow mainWindow)
+                    {
+                        mainWindow.Show();
+                        mainWindow.WindowState = System.Windows.WindowState.Normal;
+                        mainWindow.Activate();
+                        SetForegroundWindow(Process.GetCurrentProcess().MainWindowHandle);
+                        Debug.WriteLine("Ventana mostrada exitosamente");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error mostrando ventana: {ex.Message}");
+                }
+            });
         }
 
         private static void EnviarMensajeAInstanciaExistente()
@@ -105,24 +174,7 @@ namespace TaskyPad
                             if (mensaje == "SHOW_WINDOW")
                             {
                                 // Ejecutamos en el hilo principal de la UI
-                                Current?.Dispatcher?.Invoke(() =>
-                                {
-                                    try
-                                    {
-                                        if (Current?.MainWindow is MainWindow mainWindow)
-                                        {
-                                            mainWindow.Show();
-                                            mainWindow.WindowState = System.Windows.WindowState.Normal;
-                                            mainWindow.Activate();
-                                            SetForegroundWindow(Process.GetCurrentProcess().MainWindowHandle);
-                                            Debug.WriteLine("Ventana mostrada exitosamente");
-                                        }
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        Debug.WriteLine($"Error mostrando ventana: {ex.Message}");
-                                    }
-                                });
+                                CallDispatchShowProgram();
                             }
 
                             pipeServer?.Disconnect();

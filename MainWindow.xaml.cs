@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualBasic;
+﻿using Microsoft.Toolkit.Uwp.Notifications;
+using Microsoft.VisualBasic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Drawing;
@@ -45,6 +46,7 @@ namespace TaskyPad
             
             updateManager = new UpdateManager();
             CheckVersion();
+            AddToast();
         }
 
         private async void CheckVersion()
@@ -196,6 +198,18 @@ namespace TaskyPad
             SaveJSONTarea();
         }
 
+        public void UpdateTareaToList(Tarea updatedTarea)
+        {
+            var tareaExistente = _listaTareas.Find(t => t.idTarea == updatedTarea.idTarea);
+            if (tareaExistente != null)
+            {
+                tareaExistente.titulo = updatedTarea.titulo;
+                tareaExistente.descripcion = updatedTarea.descripcion;
+                tareaExistente.fecha = updatedTarea.fecha;
+                SaveJSONTarea();
+            }
+        }
+
         public void SaveJSONTarea() 
         {
             if (!Directory.Exists("tareas")) Directory.CreateDirectory("tareas");
@@ -255,6 +269,10 @@ namespace TaskyPad
 
                 // Context Menu
                 System.Windows.Controls.ContextMenu contextMenu = new System.Windows.Controls.ContextMenu();
+                System.Windows.Controls.MenuItem MenuItemEdit = new System.Windows.Controls.MenuItem();
+                MenuItemEdit.Header = "Editar";
+                MenuItemEdit.Click += (s, e) => EditarTarea(item);
+                contextMenu.Items.Add(MenuItemEdit);
                 System.Windows.Controls.MenuItem MenuItem = new System.Windows.Controls.MenuItem();
                 MenuItem.Header = "Eliminar";
                 MenuItem.Click += (s, e) => BorrarTarea(item);
@@ -368,6 +386,12 @@ namespace TaskyPad
             }
         }
 
+        private void EditarTarea(Tarea item)
+        {
+            CrearTarea editorCrearTarea = new CrearTarea(this, item);
+            editorCrearTarea.Show();
+        }
+
         private void BorrarTarea(Tarea tareaEliminada) 
         {
             MessageBoxResult eliminarTarea = System.Windows.MessageBox.Show($"Estas seguro de eliminar la tarea de {tareaEliminada.titulo}? esta accion no se puede deshacer", "Advertencia", MessageBoxButton.YesNo, MessageBoxImage.Warning);
@@ -387,6 +411,14 @@ namespace TaskyPad
             Version? getVersionAssembly = Assembly.GetExecutingAssembly().GetName().Version;
             if (getVersionAssembly is null) return;
             versionApp.Content = $"v{getVersionAssembly.Major}.{getVersionAssembly.Minor}.{getVersionAssembly.Build}";
+        }
+
+        private void AddToast()
+        {
+            new ToastContentBuilder()
+            .AddText("Notificación desde C# 🚀")
+            .AddText("Hola todopoderoso Quim, esto es una prueba.")
+            .Show();
         }
     }
 }

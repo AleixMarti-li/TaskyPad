@@ -32,7 +32,6 @@ namespace TaskyPad
     public partial class MainWindow : Window
     {
         private string[] _listaNotas = new string[0]; 
-        public List<Tarea> _listaTareas = new List<Tarea>();
         private NotifyIcon _TrayIcon;
         private UpdateManager updateManager;
         private returnMessageUpdateInfo _updateManagerResponse;
@@ -205,59 +204,47 @@ namespace TaskyPad
 
         public void AddTareaToList(Tarea nuevaTarea) 
         {
-            _listaTareas.Add(nuevaTarea);
+            taskService?._listaTareas.Add(nuevaTarea);
             SaveJSONTarea();
         }
 
         public void UpdateTareaToList(Tarea updatedTarea)
         {
-            var tareaExistente = _listaTareas.Find(t => t.idTarea == updatedTarea.idTarea);
-            if (tareaExistente != null)
-            {
-                tareaExistente.titulo = updatedTarea.titulo;
-                tareaExistente.descripcion = updatedTarea.descripcion;
-                tareaExistente.fecha = updatedTarea.fecha;
-                tareaExistente.notificar = updatedTarea.notificar;
-                SaveJSONTarea();
-                taskService.EditTimer(tareaExistente);
-            }
+            taskService?.UpdateTarea(updatedTarea, this);
         }
 
         public void SaveJSONTarea() 
         {
-            if (!Directory.Exists("tareas")) Directory.CreateDirectory("tareas");
-            if (!File.Exists("tareas\\tasks.json"))
-            {
-                using (File.Create("tareas\\tasks.json")) { }
-            }
-            string json = JsonSerializer.Serialize(_listaTareas);
-            File.WriteAllText("tareas\\tasks.json", json);
+            if (taskService is null) return;
+            taskService.SaveTareas(taskService._listaTareas);
             LoadTareas();
         }
 
         public void LoadTareas() 
         {
-            taskService.LoadTareas(this);
+            taskService?.LoadTareas(this);
         }
 
         public void RecuperarTareasUI()
         {
+            if (taskService?._listaTareas is null) return;
+
             PanelTareasNone.Children.Clear();
             PanelTareasInProgress.Children.Clear();
             PanelTareasDone.Children.Clear();
 
             var tareasDivididas = new
             {
-                None = _listaTareas.Where(t => t.estado == EstadoTarea.None).ToList(),
-                EnProgreso = _listaTareas.Where(t => t.estado == EstadoTarea.InProgress).ToList(),
-                Completada = _listaTareas.Where(t => t.estado == EstadoTarea.Done).ToList()
+                None = taskService._listaTareas.Where(t => t.estado == EstadoTarea.None).ToList(),
+                EnProgreso = taskService._listaTareas.Where(t => t.estado == EstadoTarea.InProgress).ToList(),
+                Completada = taskService._listaTareas.Where(t => t.estado == EstadoTarea.Done).ToList()
             };
 
             NoTareasPorHacerMessage.Visibility = tareasDivididas.None.Count == 0 ? Visibility.Visible : Visibility.Hidden;
             NoTareasEnProgresoMessage.Visibility = tareasDivididas.EnProgreso.Count == 0 ? Visibility.Visible : Visibility.Hidden;
             NoTareasCompletadasMessage.Visibility = tareasDivididas.Completada.Count == 0 ? Visibility.Visible : Visibility.Hidden;
 
-            foreach (var item in _listaTareas)
+            foreach (var item in taskService._listaTareas)
             {
                 // Contenedor de la tarjeta de la tarea con estilo mejorado
                 Border cardBorder = new Border();
@@ -416,14 +403,12 @@ namespace TaskyPad
         {
             MessageBoxResult eliminarTarea = System.Windows.MessageBox.Show($"Estas seguro de eliminar la tarea de {tareaEliminada.titulo}? esta accion no se puede deshacer", "Advertencia", MessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (eliminarTarea != MessageBoxResult.Yes) return;
-            _listaTareas.Remove(tareaEliminada);
-            SaveJSONTarea();
+            taskService?.DeleteTarea(tareaEliminada, this);
         }
 
         private void CambiarEstadoTarea(Tarea item, EstadoTarea nuevoEstado)
         {
-            item.estado = nuevoEstado;
-            RecuperarTareasUI(); // refrescamos la UI
+            taskService?.ChangeTaskStatus(item, nuevoEstado, this);
         }
 
         private void AddVersionAppUI() 

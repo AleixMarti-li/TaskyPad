@@ -12,6 +12,7 @@ namespace TaskyPad
 {
     public class TaskService
     {
+        public List<Tarea> _listaTareas = new List<Tarea>();
         private Dictionary<string, System.Timers.Timer> tasksDictionary = new Dictionary<string, System.Timers.Timer>();
         private NotificationService _notificationService;
         public TaskService(NotificationService notificationService)
@@ -31,13 +32,15 @@ namespace TaskyPad
             Tarea? TareaSeleccionada = LoadTareasList.FirstOrDefault(t => t.idTarea == taskId);
             if (TareaSeleccionada is null) return;
 
+            ChangeTaskStatus(TareaSeleccionada, EstadoTarea.Done);
+
         }
 
         public void InicializeTimers()
         {
-            List<Tarea>? listaTareasParaTimers = LoadTareas();
-            if (listaTareasParaTimers is null) return;
-            foreach (Tarea teareaIndividual in listaTareasParaTimers)
+            LoadTareasInternos();
+            if (_listaTareas is null || _listaTareas.Count == 0) return;
+            foreach (Tarea teareaIndividual in _listaTareas)
             {
                 CreateTimer(teareaIndividual);
             }
@@ -102,10 +105,68 @@ namespace TaskyPad
         private void HandleTimerElapsed(object? sender, ElapsedEventArgs e, Tarea tareaEjecutada)
         {
             //recuperar tarea
+            if (tareaEjecutada.estado == EstadoTarea.Done) return;
             _notificationService.SendWindowsTaskNotificacionEndTime(tareaEjecutada);
         }
 
+        public void UpdateTarea(Tarea updatedTarea, MainWindow mainWindow)
+        {
+            var tareaExistente = _listaTareas.Find(t => t.idTarea == updatedTarea.idTarea);
+            if (tareaExistente != null)
+            {
+                tareaExistente.titulo = updatedTarea.titulo;
+                tareaExistente.descripcion = updatedTarea.descripcion;
+                tareaExistente.fecha = updatedTarea.fecha;
+                tareaExistente.notificar = updatedTarea.notificar;
+                tareaExistente.ultimaModificacion = DateTime.Now;
+                
+                SaveTareas(_listaTareas);
+                EditTimer(tareaExistente);
+                mainWindow.RecuperarTareasUI();
+            }
+        }
+
+        public void DeleteTarea(Tarea tareaEliminada, MainWindow mainWindow)
+        {
+            _listaTareas.Remove(tareaEliminada);
+            DeleteTimer(tareaEliminada);
+            SaveTareas(_listaTareas);
+            mainWindow.RecuperarTareasUI();
+        }
+
+        public void ChangeTaskStatus(Tarea tarea, EstadoTarea nuevoEstado, MainWindow? mainWindow = null)
+        {
+            var tareaExistente = _listaTareas.Find(t => t.idTarea == tarea.idTarea);
+            if (tareaExistente != null)
+            {
+                tareaExistente.estado = nuevoEstado;
+                tareaExistente.ultimaModificacion = DateTime.Now;
+                SaveTareas(_listaTareas);
+
+                if (mainWindow is not null)
+                {
+                    mainWindow.RecuperarTareasUI();
+                    return;
+                } else
+                {
+                    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        // Aquí debes obtener la ventana actual si quieres refrescar algo
+                        var win = System.Windows.Application.Current.MainWindow as MainWindow;
+                        win?.RecuperarTareasUI();
+                    });
+                }
+            }
+        }
+
         public List<Tarea>? LoadTareas(MainWindow? mainWindow = null)
+        {
+            LoadTareasInternos();
+            if (mainWindow is not null) mainWindow.RecuperarTareasUI();
+            return _listaTareas;
+        }
+
+        private void LoadTareasInternos()
         {
             if (!Directory.Exists("tareas")) Directory.CreateDirectory("tareas");
             if (!File.Exists("tareas\\tasks.json"))
@@ -113,12 +174,25 @@ namespace TaskyPad
                 using (File.Create("tareas\\tasks.json")) { }
             }
             string conteindoJSON = File.ReadAllText("tareas\\tasks.json");
-            if (string.IsNullOrEmpty(conteindoJSON)) return new List<Tarea>();
+            if (string.IsNullOrEmpty(conteindoJSON))
+            {
+                _listaTareas = new List<Tarea>();
+                return;
+            }
             List<Tarea>? tareasRecuperadas = JsonSerializer.Deserialize<List<Tarea>>(conteindoJSON);
+            _listaTareas = tareasRecuperadas ?? new List<Tarea>();
+        }
 
-            if (mainWindow is not null) RechargeTareasUI(tareasRecuperadas, mainWindow);
-
-            return tareasRecuperadas;
+        public void SaveTareas(List<Tarea> tareas)
+        {
+            if (!Directory.Exists("tareas")) Directory.CreateDirectory("tareas");
+            if (!File.Exists("tareas\\tasks.json"))
+            {
+                using (File.Create("tareas\\tasks.json")) { }
+            }
+            string json = JsonSerializer.Serialize(tareas);
+            File.WriteAllText("tareas\\tasks.json", json);
+            _listaTareas = tareas;
         }
 
         public void RechargeTareasUI(List<Tarea>? tareasRecuperadas, MainWindow mainWindow)
@@ -130,7 +204,7 @@ namespace TaskyPad
                 mainWindow.NoTareasCompletadasMessage.Visibility = Visibility.Visible;
                 return;
             }
-            mainWindow._listaTareas = tareasRecuperadas;
+            _listaTareas = tareasRecuperadas;
             mainWindow.RecuperarTareasUI();
         }
     }

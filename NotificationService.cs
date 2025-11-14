@@ -20,10 +20,14 @@ namespace TaskyPad
 #endif
 
                 .AddButton(new ToastButton()
+                    .SetContent("Posponer '10")
+                    .AddArgument("action", "posponer=10")
+                    .SetBackgroundActivation())
+
+                .AddButton(new ToastButton()
                     .SetContent("Hecho")
                     .AddArgument("action", "done")
                     .SetBackgroundActivation())
-
 
                 .Show();
         }

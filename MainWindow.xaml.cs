@@ -417,5 +417,10 @@ namespace TaskyPad
             if (getVersionAssembly is null) return;
             versionApp.Content = $"v{getVersionAssembly.Major}.{getVersionAssembly.Minor}.{getVersionAssembly.Build}";
         }
+
+        public void ExecuteTaskAction(string taskId, string action)
+        {
+            taskService?.ExecuteAction(taskId, action);
+        }
     }
 }

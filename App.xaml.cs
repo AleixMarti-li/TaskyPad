@@ -92,7 +92,15 @@ namespace TaskyPad
                 {
                     action = args["action"];
                     Debug.WriteLine($"action: {action}");
-                    new TaskService().ExecuteAction(taskId, action);
+                    
+                    // Usar la instancia de TaskService de MainWindow en lugar de crear una nueva
+                    Current?.Dispatcher?.Invoke(() =>
+                    {
+                        if (Current?.MainWindow is MainWindow mainWindow)
+                        {
+                            mainWindow.ExecuteTaskAction(taskId, action);
+                        }
+                    });
                 }
 
                 if (!(string.IsNullOrEmpty(taskId)) && (string.IsNullOrEmpty(action)))

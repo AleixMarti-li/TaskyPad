@@ -27,13 +27,10 @@ namespace TaskyPad
 
         public void ExecuteAction(string taskId, string action)
         {
-            List<Tarea>? LoadTareasList = LoadTareas();
-            if (LoadTareasList is null) return;
-            Tarea? TareaSeleccionada = LoadTareasList.FirstOrDefault(t => t.idTarea == taskId);
+            Tarea? TareaSeleccionada = _listaTareas.FirstOrDefault(t => t.idTarea == taskId);
             if (TareaSeleccionada is null) return;
 
             ChangeTaskStatus(TareaSeleccionada, EstadoTarea.Done);
-
         }
 
         public void InicializeTimers()

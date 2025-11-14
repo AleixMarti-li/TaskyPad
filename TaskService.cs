@@ -30,7 +30,28 @@ namespace TaskyPad
             Tarea? TareaSeleccionada = _listaTareas.FirstOrDefault(t => t.idTarea == taskId);
             if (TareaSeleccionada is null) return;
 
-            ChangeTaskStatus(TareaSeleccionada, EstadoTarea.Done);
+            if (action == "done")
+            {
+                ChangeTaskStatus(TareaSeleccionada, EstadoTarea.Done);
+                return;
+            }
+
+            if (action.Contains("posponer"))
+            {
+                string[] partesPosponer = action.Split('=');
+                if (partesPosponer.Length != 2) return;
+
+                string timeStr = partesPosponer[1];
+                int time;
+                if (!int.TryParse(timeStr, out time))
+                {
+                    return;
+                }
+
+                TareaSeleccionada.fecha = DateTime.Now.AddMinutes(time);
+
+                UpdateTarea(TareaSeleccionada);
+            }
         }
 
         public void InicializeTimers()
@@ -106,7 +127,7 @@ namespace TaskyPad
             _notificationService.SendWindowsTaskNotificacionEndTime(tareaEjecutada);
         }
 
-        public void UpdateTarea(Tarea updatedTarea, MainWindow mainWindow)
+        public void UpdateTarea(Tarea updatedTarea, MainWindow? mainWindow = null)
         {
             var tareaExistente = _listaTareas.Find(t => t.idTarea == updatedTarea.idTarea);
             if (tareaExistente != null)
@@ -119,7 +140,20 @@ namespace TaskyPad
                 
                 SaveTareas(_listaTareas);
                 EditTimer(tareaExistente);
-                mainWindow.RecuperarTareasUI();
+
+                if (mainWindow is not null)
+                {
+                    mainWindow.RecuperarTareasUI();
+                    return;
+                } else
+                {
+                    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        // Aquí debes obtener la ventana actual si quieres refrescar algo
+                        var win = System.Windows.Application.Current.MainWindow as MainWindow;
+                        win?.RecuperarTareasUI();
+                    });
+                }
             }
         }
 

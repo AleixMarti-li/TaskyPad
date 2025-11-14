@@ -32,13 +32,17 @@ namespace TaskyPad
     public partial class MainWindow : Window
     {
         private string[] _listaNotas = new string[0]; 
-        private List<Tarea> _listaTareas = new List<Tarea>();
+        public List<Tarea> _listaTareas = new List<Tarea>();
         private NotifyIcon _TrayIcon;
         private UpdateManager updateManager;
         private returnMessageUpdateInfo _updateManagerResponse;
+        private NotificationService notificationService;
+        private TaskService? taskService;
         public MainWindow()
         {
             InitializeComponent();
+            CreateNotificationService();
+            CreateTaskService();
             loadTrayIcon();
             AddVersionAppUI();
             RecuperarNotas();
@@ -47,7 +51,15 @@ namespace TaskyPad
             updateManager = new UpdateManager();
             CheckVersion();
         }
-
+        private void CreateNotificationService()
+        {
+            notificationService = new NotificationService();
+        }
+        private void CreateTaskService()
+        {
+            taskService = new TaskService(notificationService);
+            taskService.InicializeTimers();
+        }
         private async void CheckVersion()
         {
             _updateManagerResponse = await updateManager.CheckActualizacionDisponible();
@@ -205,7 +217,9 @@ namespace TaskyPad
                 tareaExistente.titulo = updatedTarea.titulo;
                 tareaExistente.descripcion = updatedTarea.descripcion;
                 tareaExistente.fecha = updatedTarea.fecha;
+                tareaExistente.notificar = updatedTarea.notificar;
                 SaveJSONTarea();
+                taskService.EditTimer(tareaExistente);
             }
         }
 
@@ -223,26 +237,10 @@ namespace TaskyPad
 
         public void LoadTareas() 
         {
-            if (!Directory.Exists("tareas")) Directory.CreateDirectory("tareas");
-            if (!File.Exists("tareas\\tasks.json"))
-            {
-                using (File.Create("tareas\\tasks.json")) { }
-            }
-            string conteindoJSON = File.ReadAllText("tareas\\tasks.json");
-            if (string.IsNullOrEmpty(conteindoJSON)) return;
-            List<Tarea>? tareasRecuperadas = JsonSerializer.Deserialize<List<Tarea>>(conteindoJSON);
-            if (tareasRecuperadas is null) 
-            {
-                NoTareasPorHacerMessage.Visibility = Visibility.Visible;
-                NoTareasEnProgresoMessage.Visibility = Visibility.Visible;
-                NoTareasCompletadasMessage.Visibility = Visibility.Visible;
-                return;
-            }
-            _listaTareas = tareasRecuperadas;
-            RecuperarTareasUI();
+            taskService.LoadTareas(this);
         }
 
-        private void RecuperarTareasUI()
+        public void RecuperarTareasUI()
         {
             PanelTareasNone.Children.Clear();
             PanelTareasInProgress.Children.Clear();
@@ -296,7 +294,7 @@ namespace TaskyPad
 #if DEBUG
                 System.Windows.Controls.MenuItem MenuItemDebugNotification = new System.Windows.Controls.MenuItem();
                 MenuItemDebugNotification.Header = "Emular Notificación";
-                MenuItemDebugNotification.Click += (s, e) => SendWindowsTaskNotificacion(item);
+                MenuItemDebugNotification.Click += (s, e) => notificationService.SendWindowsTaskNotificacionEndTime(item);
                 contextMenu.Items.Add(MenuItemDebugNotification);
 #endif
                 cardBorder.ContextMenu = contextMenu;
@@ -406,25 +404,6 @@ namespace TaskyPad
                         break;
                 }
             }
-        }
-
-        private void SendWindowsTaskNotificacion(Tarea item)
-        {
-            new ToastContentBuilder()
-                .AddArgument("taskId", item.idTarea)
-                .AddText($"Tarea Por Hacer: {item.titulo}")
-                .AddText($"{item.descripcion}")
-#if DEBUG
-                .AddText($"{item.idTarea}")
-#endif
-
-                .AddButton(new ToastButton()
-                    .SetContent("Hecho")
-                    .AddArgument("action", "done")
-                    .SetBackgroundActivation())
-
-
-                .Show();
         }
 
         private void EditarTarea(Tarea item)

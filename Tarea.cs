@@ -12,6 +12,8 @@ namespace TaskyPad
         public DateTime fecha { get; set; }
         public string idTarea { get; set; }
         public DateTime ultimaModificacion { get; set; }
+        public bool esPrioritaria { get; set; } = false;
+        public bool notificar { get; set; } = true;
 
         public Tarea(string titulo, string descripcion, DateTime fecha)
         {

@@ -72,7 +72,7 @@ namespace TaskyPad
         }
         private async void ButtonUpdateVersion_Click(object sender, RoutedEventArgs e)
         {
-            CustomMessageBoxResult eliminarNota = CustomMessageBox.ShowConfirmation(this, $"¿Estás completamente seguro de que deseas actualizar a la versión v({_updateManagerResponse.version})? \n\nEsta acción reemplazará la versión que estás usando ahora mismo y aplicará todos los cambios incluidos en la nueva actualización.", $"Actualizar a la versión v{_updateManagerResponse.version}", CustomMessageBoxButton.YesNo, iconPath: "pack://application:,,,/Resources/cloud-arrow-down-fill.svg", headerLogoPath: "pack://application:,,,/Resources/logo.ico");
+            CustomMessageBoxResult eliminarNota = CustomMessageBox.ShowConfirmation(this, $"¿Estás completamente seguro de que deseas actualizar a la versión v({_updateManagerResponse.version})? \n\nEsta acción reemplazará la versión que estás usando ahora mismo y aplicará todos los cambios incluidos en la nueva actualización.", $"Actualizar a la versión v{_updateManagerResponse.version}", CustomMessageBoxButton.YesNo, iconPath: "pack://application:,,,/Resources/cloudUpdate.png", headerLogoPath: "pack://application:,,,/Resources/logo.ico");
             if (eliminarNota != CustomMessageBoxResult.Yes) return;
             ButtonUpdateVersion.IsEnabled = false;
             ButtonUpdateVersion.Content = "Descargando actualización...";

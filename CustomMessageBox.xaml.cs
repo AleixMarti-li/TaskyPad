@@ -16,7 +16,7 @@ namespace TaskyPad
         }
 
         // Método estático para mostrar el diálogo (síncrono, devuelve resultado)
-        public static CustomMessageBoxResult Show(Window owner, string message, string title = "",
+        public static CustomMessageBoxResult ShowConfirmation(Window owner, string message, string title = "",
             CustomMessageBoxButton buttons = CustomMessageBoxButton.OK, string iconPath = null, string headerLogoPath = null)
         {
             var dlg = new CustomMessageBox();

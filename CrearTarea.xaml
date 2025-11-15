@@ -3,16 +3,231 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:TaskyPad" xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:local="clr-namespace:TaskyPad"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
-        Title="CrearTarea" Height="450" Width="800">
-    <Grid>
-        <TextBox x:Name="TituloTarea" HorizontalAlignment="Left" Margin="81,69,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
-        <TextBox x:Name="DescripcionTarea" HorizontalAlignment="Left" Margin="81,119,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
-        <DatePicker x:Name="FechaTarea" HorizontalAlignment="Left" Margin="81,179,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="BtnCrearTarea" Content="Button" HorizontalAlignment="Left" Margin="81,267,0,0" VerticalAlignment="Top" Click="BtnCrearTarea_Click"/>
-        <xctk:TimePicker x:Name="TimePickerTarea" 
-                         Width="120" Height="30"
-                         Format="Custom" FormatString="HH:mm"/>
+        Title="Crear Nueva Tarea"
+        Height="700"
+        Width="600"
+        WindowStartupLocation="CenterOwner"
+        Background="#F8F9FA"
+        BorderThickness="0"
+        ResizeMode="NoResize"
+        WindowStyle="SingleBorderWindow">
+    <Window.Resources>
+        <Style x:Key="ModernTextBox" TargetType="TextBox">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="Foreground" Value="#2C3E50"/>
+            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+            <Setter Property="BorderThickness" Value="0,0,0,2"/>
+            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="Margin" Value="0,8,0,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                        Padding="{TemplateBinding Padding}"
+                                        VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter Property="BorderBrush" Value="#3498DB"/>
+                                <Setter Property="Background" Value="#FFFFFF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ModernLabel" TargetType="Label">
+            <Setter Property="Foreground" Value="#2C3E50"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="Padding" Value="0,0,0,4"/>
+        </Style>
+
+        <Style x:Key="ModernButton" TargetType="Button">
+            <Setter Property="Background" Value="#3498DB"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="Padding" Value="24,12"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#2980B9"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#1F618D"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="CancelButton" TargetType="Button" BasedOn="{StaticResource ModernButton}">
+            <Setter Property="Background" Value="#95A5A6"/>
+        </Style>
+
+        <Style x:Key="ModernDatePicker" TargetType="DatePicker">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="Foreground" Value="#2C3E50"/>
+            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+            <Setter Property="BorderThickness" Value="0,0,0,2"/>
+            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+        </Style>
+
+        <Style x:Key="ModernCheckBox" TargetType="CheckBox">
+            <Setter Property="Foreground" Value="#2C3E50"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="Margin" Value="0,8,0,0"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Background="#F8F9FA">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Alert Section (Fixed at top) -->
+        <Border x:Name="AlertBorder"
+                Grid.Row="0"
+                Background="#FEE"
+                BorderBrush="#E74C3C"
+                BorderThickness="0,0,0,2"
+                Padding="20,16"
+                Visibility="Collapsed">
+            <StackPanel>
+                <TextBlock Text="⚠ Campos incompletos" 
+                           FontSize="13" 
+                           FontWeight="Bold" 
+                           Foreground="#C0392B"
+                           FontFamily="Segoe UI"
+                           Margin="0,0,0,8"/>
+                <TextBlock x:Name="AlertMessage"
+                           Text="" 
+                           FontSize="12" 
+                           Foreground="#A93226"
+                           FontFamily="Segoe UI"
+                           TextWrapping="Wrap"
+                           LineHeight="18"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Scrollable Content -->
+        <ScrollViewer Grid.Row="1" 
+                      VerticalScrollBarVisibility="Auto"
+                      PanningMode="VerticalOnly">
+            <StackPanel Margin="40,30,40,20">
+                <!-- Header -->
+                <TextBlock Text="Crear Nueva Tarea" 
+                           FontSize="24" 
+                           FontWeight="Bold" 
+                           Foreground="#2C3E50" 
+                           FontFamily="Segoe UI"
+                           Margin="0,0,0,30"/>
+
+                <!-- Título -->
+                <Label Content="Título de la tarea" Style="{StaticResource ModernLabel}"/>
+                <TextBox x:Name="TituloTarea" 
+                         Style="{StaticResource ModernTextBox}" 
+                         Text="" 
+                         Height="40"
+                         TextWrapping="Wrap"/>
+
+                <!-- Descripción -->
+                <Label Content="Descripción" 
+                       Style="{StaticResource ModernLabel}" 
+                       Margin="0,20,0,0"/>
+                <TextBox x:Name="DescripcionTarea" 
+                         Style="{StaticResource ModernTextBox}" 
+                         Text="" 
+                         Height="80"
+                         TextWrapping="Wrap"
+                         VerticalScrollBarVisibility="Auto"
+                         AcceptsReturn="True"/>
+
+                <!-- Fecha y Hora -->
+                <Grid Margin="0,20,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="20"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Fecha -->
+                    <StackPanel Grid.Column="0">
+                        <Label Content="Fecha" Style="{StaticResource ModernLabel}"/>
+                        <DatePicker x:Name="FechaTarea" 
+                                    Style="{StaticResource ModernDatePicker}" 
+                                    Height="40"/>
+                    </StackPanel>
+
+                    <!-- Hora -->
+                    <StackPanel Grid.Column="2">
+                        <Label Content="Hora" Style="{StaticResource ModernLabel}"/>
+                        <xctk:TimePicker x:Name="TimePickerTarea"
+                                         Width="Auto"
+                                         Height="40"
+                                         Format="Custom"
+                                         FormatString="HH:mm"
+                                         Background="#FFFFFF"
+                                         Foreground="#2C3E50"
+                                         FontSize="14"
+                                         FontFamily="Segoe UI"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Notificación -->
+                <CheckBox x:Name="NotificarTarea" 
+                          Content="Enviar notificación en la fecha programada" 
+                          Style="{StaticResource ModernCheckBox}"
+                          Margin="0,24,0,0" 
+                          IsChecked="True"/>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Buttons Footer (Fixed at bottom) -->
+        <StackPanel Grid.Row="2"
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Right" 
+                    Margin="40,20,40,20"
+                    Height="44">
+            <Button x:Name="BtnCancelar" 
+                    Content="Cancelar" 
+                    Style="{StaticResource CancelButton}" 
+                    Width="120"
+                    Click="BtnCancelar_Click"
+                    Margin="0,0,12,0"/>
+            <Button x:Name="BtnCrearTarea" 
+                    Content="Crear Tarea" 
+                    Style="{StaticResource ModernButton}" 
+                    Width="140"
+                    Click="BtnCrearTarea_Click"/>
+        </StackPanel>
     </Grid>
 </Window>

@@ -15,11 +15,12 @@ namespace TaskyPad
         public bool esPrioritaria { get; set; } = false;
         public bool notificar { get; set; } = true;
 
-        public Tarea(string titulo, string descripcion, DateTime fecha)
+        public Tarea(string titulo, string descripcion, DateTime fecha, bool notificar)
         {
             this.titulo = titulo;
             this.descripcion = descripcion;
             this.fecha = fecha;
+            this.notificar = notificar;
             idTarea = Guid.NewGuid().ToString();
             ultimaModificacion = DateTime.Now;
         }

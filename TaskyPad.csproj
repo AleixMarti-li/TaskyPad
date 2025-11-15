@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <None Remove="Resources\cloudUpdate.png" />
+    <None Remove="Resources\trash.png" />
     <None Remove="Resources\warn.jpg" />
   </ItemGroup>
 
@@ -48,6 +49,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\trash.png" />
     <Resource Include="Resources\warn.jpg">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>

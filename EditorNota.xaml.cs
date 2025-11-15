@@ -37,8 +37,7 @@ namespace TaskyPad
 
         private void BtnEliminar(object sender, RoutedEventArgs e)
         {
-            var eliminarNota = CustomMessageBox.ShowConfirmation(this, "¿Eliminar el archivo?", "Confirmar eliminación", CustomMessageBoxButton.YesNo, iconPath: "pack://application:,,,/Resources/warn.jpg", headerLogoPath: "pack://application:,,,/Resources/warn.jpg");
-            //MessageBoxResult eliminarNota = System.Windows.MessageBox.Show($"Estas seguro de eliminar la nota de {_nombreNota}? esta accion no se puede deshacer", "Advertencia", MessageBoxButton.YesNo,MessageBoxImage.Warning);
+            var eliminarNota = CustomMessageBox.ShowConfirmation(this, "¿Quieres eliminar este archivo?", "Confirma que deseas proceder con la eliminación.", CustomMessageBoxButton.YesNo, iconPath: "pack://application:,,,/Resources/trash.png", headerLogoPath: "pack://application:,,,/Resources/logo.ico");
             if (eliminarNota != CustomMessageBoxResult.Yes) return;
             string path = $"notas/{_nombreNota}.txt";
             File.Delete(path);

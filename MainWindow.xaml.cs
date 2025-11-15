@@ -401,8 +401,8 @@ namespace TaskyPad
 
         private void BorrarTarea(Tarea tareaEliminada) 
         {
-            MessageBoxResult eliminarTarea = System.Windows.MessageBox.Show($"Estas seguro de eliminar la tarea de {tareaEliminada.titulo}? esta accion no se puede deshacer", "Advertencia", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-            if (eliminarTarea != MessageBoxResult.Yes) return;
+            CustomMessageBoxResult eliminarNota = CustomMessageBox.ShowConfirmation(this, "¿Quieres eliminar esta tarea?", "Confirma que deseas proceder con la eliminación.", CustomMessageBoxButton.YesNo, iconPath: "pack://application:,,,/Resources/trash.png", headerLogoPath: "pack://application:,,,/Resources/logo.ico");
+            if (eliminarNota != CustomMessageBoxResult.Yes) return;
             taskService?.DeleteTarea(tareaEliminada, this);
         }
 

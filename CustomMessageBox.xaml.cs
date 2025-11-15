@@ -139,5 +139,14 @@ namespace TaskyPad
             _result = CustomMessageBoxResult.None;
             this.Close();
         }
+
+        // Funcionalidad para arrastrar desde el header
+        private void HeaderBorder_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (e.LeftButton == System.Windows.Input.MouseButtonState.Pressed)
+            {
+                this.DragMove();
+            }
+        }
     }
 }

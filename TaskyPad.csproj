@@ -9,7 +9,7 @@
 	<UseWindowsForms>true</UseWindowsForms>
     <AssemblyVersion>1.0.4</AssemblyVersion>
 	<StartupObject>TaskyPad.App</StartupObject>
-	<ApplicationIcon>logo.ico</ApplicationIcon>
+	<ApplicationIcon>Resources\logo.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,7 +26,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="logo.ico" />
+    <Content Include="Resources\logo.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\logo.ico" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,7 +40,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="logo.ico">
+    <None Update="Resources\logo.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

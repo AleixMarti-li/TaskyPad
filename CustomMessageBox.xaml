@@ -3,47 +3,218 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         WindowStartupLocation="CenterOwner"
         SizeToContent="WidthAndHeight"
-        MinWidth="320"
-        MaxWidth="800"
+        MinWidth="380"
+        MaxWidth="900"
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
-        ShowInTaskbar="False">
-    <Border CornerRadius="8" Background="White" Padding="12" 
-            BorderBrush="#DDDDDD" BorderThickness="1" >
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <!-- header -->
-                <RowDefinition Height="Auto"/>
-                <!-- contenido -->
-                <RowDefinition Height="Auto"/>
-                <!-- botones -->
-            </Grid.RowDefinitions>
+        ShowInTaskbar="False"
+        Topmost="True"
+        ResizeMode="NoResize">
+    
+    <Window.Resources>
+        <!-- Estilos de botones profesionales -->
+        <Style x:Key="PrimaryButtonStyle" TargetType="Button">
+            <Setter Property="Padding" Value="16,8,16,8"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="MinWidth" Value="90"/>
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="#3498DB"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border CornerRadius="6" Background="{TemplateBinding Background}" 
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#2980B9"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#21618C"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
-            <!-- Header (título y logo pequeño) -->
-            <DockPanel Grid.Row="0" Margin="0 0 0 8">
-                <Image x:Name="LogoHeader" Width="28" Height="28" Margin="0,0,8,0" Visibility="Collapsed"/>
-                <TextBlock x:Name="TxtTitle" VerticalAlignment="Center" FontWeight="SemiBold" FontSize="14"/>
-                <!-- Close -->
-                <Button DockPanel.Dock="Right" Content="✕" Width="28" Height="28" 
-                        Background="Transparent" BorderThickness="0" 
-                        Click="Close_Click" />
-            </DockPanel>
+        <Style x:Key="SecondaryButtonStyle" TargetType="Button">
+            <Setter Property="Padding" Value="16,8,16,8"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="MinWidth" Value="90"/>
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Foreground" Value="#2C3E50"/>
+            <Setter Property="Background" Value="#ECF0F1"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border CornerRadius="6" Background="{TemplateBinding Background}" 
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#D5DBDB"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#BDC3C7"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
-            <!-- Contenido -->
-            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0 6 0 12">
-                <Image x:Name="IconImage" Width="48" Height="48" Margin="0,0,12,0" Visibility="Collapsed"/>
-                <TextBlock x:Name="TxtMessage" TextWrapping="Wrap" VerticalAlignment="Center" FontSize="13" />
-            </StackPanel>
+        <Style x:Key="CloseButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="32"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Foreground" Value="#95A5A6"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border CornerRadius="4" Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#34495E"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#2C3E50"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
 
-            <!-- Botones -->
-            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-                <!-- Botones definidos desde code-behind -->
-                <Button x:Name="BtnSecondary" MinWidth="80" Height="30" Visibility="Collapsed" Click="BtnSecondary_Click"/>
-                <Button x:Name="BtnPrimary" MinWidth="80" Height="30" Visibility="Collapsed" Click="BtnPrimary_Click"/>
-                <Button x:Name="BtnExtra" MinWidth="80" Height="30" Visibility="Collapsed" Click="BtnExtra_Click"/>
-            </StackPanel>
-        </Grid>
-    </Border>
+    <!-- Efecto de sombra exterior -->
+    <Grid Background="Transparent">
+        <Border CornerRadius="10" 
+                Background="White" 
+                Padding="0"
+                BorderBrush="#BDBDBD" 
+                BorderThickness="1">
+            
+            <!-- Efecto de sombra -->
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="15" ShadowDepth="3" Opacity="0" Color="Black"/>
+            </Border.Effect>
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50"/>
+                    <!-- Header (título y botón cerrar) -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Contenido -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Botones -->
+                </Grid.RowDefinitions>
+
+                <!-- Header con gradiente - Arrastrable -->
+                <Border Grid.Row="0" 
+                        CornerRadius="10,10,0,0"
+                        Background="#F8F9FA"
+                        BorderBrush="#E0E0E0"
+                        BorderThickness="0,0,0,1"
+                        x:Name="HeaderBorder"
+                        MouseDown="HeaderBorder_MouseDown">
+                    
+                    <DockPanel Margin="16,0,12,0" VerticalAlignment="Center">
+                        <!-- Logo/Icono del header (izquierda) -->
+                        <Image x:Name="LogoHeader" 
+                               Width="28" Height="28" 
+                               Margin="0,0,12,0" 
+                               Visibility="Collapsed"
+                               DockPanel.Dock="Left"/>
+                        
+                        <!-- Botón cerrar (derecha) -->
+                        <Button DockPanel.Dock="Right" 
+                                Content="✕" 
+                                Click="Close_Click"
+                                Style="{StaticResource CloseButtonStyle}"/>
+                        
+                        <!-- Título (centro-izquierda) -->
+                        <TextBlock x:Name="TxtTitle" 
+                                   VerticalAlignment="Center" 
+                                   FontWeight="SemiBold" 
+                                   FontSize="14"
+                                   Foreground="#2C3E50"
+                                   DockPanel.Dock="Left"/>
+                    </DockPanel>
+                </Border>
+
+                <!-- Contenido - Mensaje e icono -->
+                <StackPanel Grid.Row="1" 
+                            Orientation="Horizontal" 
+                            Margin="20,16,20,12"
+                            VerticalAlignment="Top">
+                    
+                    <!-- Icono principal (izquierda) -->
+                    <Image x:Name="IconImage" 
+                           Width="56" Height="56" 
+                           Margin="0,0,16,0" 
+                           Visibility="Collapsed"
+                           Stretch="UniformToFill"
+                           VerticalAlignment="Top"/>
+                    
+                    <!-- Mensaje (derecha) -->
+                    <TextBlock x:Name="TxtMessage" 
+                               TextWrapping="Wrap" 
+                               VerticalAlignment="Top" 
+                               FontSize="13"
+                               Foreground="#34495E"
+                               LineHeight="20"
+                               MaxWidth="600"/>
+                </StackPanel>
+
+                <!-- Botones -->
+                <StackPanel Grid.Row="2" 
+                            Orientation="Horizontal" 
+                            HorizontalAlignment="Right"
+                            Margin="20,0,20,16">
+                    
+                    <!-- Botones definidos desde code-behind -->
+                    <Button x:Name="BtnExtra" 
+                            Visibility="Collapsed" 
+                            Click="BtnExtra_Click"
+                            Margin="0,0,10,0"
+                            Style="{StaticResource SecondaryButtonStyle}"/>
+                    
+                    <Button x:Name="BtnSecondary" 
+                            Visibility="Collapsed" 
+                            Click="BtnSecondary_Click"
+                            Margin="0,0,10,0"
+                            Style="{StaticResource SecondaryButtonStyle}"/>
+                    
+                    <Button x:Name="BtnPrimary" 
+                            Visibility="Collapsed" 
+                            Click="BtnPrimary_Click"
+                            Style="{StaticResource PrimaryButtonStyle}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
 </Window>

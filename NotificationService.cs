@@ -14,7 +14,7 @@ namespace TaskyPad
         public void SendWindowsTaskNotificacionEndTime(Tarea item)
         {
             var exePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var iconPath = Path.Combine(exePath!, "logo.ico");
+            var iconPath = Path.Combine(exePath!, "Resources\\logo.ico");
 
             new ToastContentBuilder()
                 .AddArgument("taskId", item.idTarea)

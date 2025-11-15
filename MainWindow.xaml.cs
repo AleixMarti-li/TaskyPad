@@ -72,7 +72,7 @@ namespace TaskyPad
         }
         private async void ButtonUpdateVersion_Click(object sender, RoutedEventArgs e)
         {
-            CustomMessageBoxResult eliminarNota = CustomMessageBox.Show(this, $"¿Seguro que quieras actualizar al a versión {_updateManagerResponse.version}?", $"Actualización {_updateManagerResponse.version}", CustomMessageBoxButton.YesNo, iconPath: "pack://application:,,,/Resources/warn.jpg", headerLogoPath: "pack://application:,,,/Resources/warn.jpg");
+            CustomMessageBoxResult eliminarNota = CustomMessageBox.Show(this, $"¿Estás completamente seguro de que deseas actualizar a la versión v({_updateManagerResponse.version})? \n\nEsta acción reemplazará la versión que estás usando ahora mismo y aplicará todos los cambios incluidos en la nueva actualización.", $"Actualizar a la versión v{_updateManagerResponse.version}", CustomMessageBoxButton.YesNo, iconPath: "pack://application:,,,/Resources/warn.jpg", headerLogoPath: "pack://application:,,,/Resources/logo.ico");
             if (eliminarNota != CustomMessageBoxResult.Yes) return;
             ButtonUpdateVersion.IsEnabled = false;
             ButtonUpdateVersion.Content = "Descargando actualización...";
@@ -96,7 +96,7 @@ namespace TaskyPad
             _TrayIcon = new NotifyIcon();
             _TrayIcon.Visible = false;
             _TrayIcon.Text = "TaskyPad";
-            _TrayIcon.Icon = new Icon("logo.ico");
+            _TrayIcon.Icon = new Icon("Resources\\logo.ico");
             _TrayIcon.ContextMenuStrip = new ContextMenuStrip();
             _TrayIcon.ContextMenuStrip.Items.Add("Abrir", null, (s, e) =>
             {

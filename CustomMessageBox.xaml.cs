@@ -9,13 +9,15 @@ namespace TaskyPad
     public partial class CustomMessageBox : Window
     {
         private CustomMessageBoxResult _result = CustomMessageBoxResult.None;
+        private string _inputValue = string.Empty;
+        private bool _isInputMode = false;
 
         public CustomMessageBox()
         {
             InitializeComponent();
         }
 
-        // Método estático para mostrar el diálogo (síncrono, devuelve resultado)
+        // Método estático para mostrar el diálogo de confirmación (síncrono, devuelve resultado)
         public static CustomMessageBoxResult ShowConfirmation(Window owner, string message, string title = "",
             CustomMessageBoxButton buttons = CustomMessageBoxButton.OK, string iconPath = null, string headerLogoPath = null)
         {
@@ -65,6 +67,66 @@ namespace TaskyPad
             return dlg._result;
         }
 
+        // Método estático para mostrar el diálogo de entrada de texto
+        public static string ShowInput(Window owner, string message, string title = "", 
+            string defaultValue = "", string inputLabel = "", string iconPath = null, string headerLogoPath = null)
+        {
+            var dlg = new CustomMessageBox();
+            dlg._isInputMode = true;
+            
+            if (owner != null) dlg.Owner = owner;
+
+            dlg.TxtMessage.Text = message ?? "";
+            dlg.TxtTitle.Text = title ?? "";
+            dlg.InputTextBox.Text = defaultValue ?? "";
+
+            // Establecer etiqueta del input si se proporciona
+            if (!string.IsNullOrEmpty(inputLabel))
+            {
+                dlg.TxtInputLabel.Text = inputLabel;
+                dlg.TxtInputLabel.Visibility = Visibility.Visible;
+            }
+
+            // Mostrar el panel de entrada
+            dlg.InputPanel.Visibility = Visibility.Visible;
+
+            // Icono principal (opcional)
+            if (!string.IsNullOrEmpty(iconPath))
+            {
+                dlg.IconImage.Source = new System.Windows.Media.Imaging.BitmapImage(new Uri(iconPath, UriKind.RelativeOrAbsolute));
+                dlg.IconImage.Visibility = Visibility.Visible;
+            }
+
+            // Logo en el header (opcional)
+            if (!string.IsNullOrEmpty(headerLogoPath))
+            {
+                dlg.LogoHeader.Source = new System.Windows.Media.Imaging.BitmapImage(new Uri(headerLogoPath, UriKind.RelativeOrAbsolute));
+                dlg.LogoHeader.Visibility = Visibility.Visible;
+            }
+
+            // Configurar botones para input (OK y Cancelar)
+            dlg.ShowSecondary("Cancelar", CustomMessageBoxResult.Cancel, isCancel: true);
+            dlg.ShowPrimary("OK", CustomMessageBoxResult.OK, isAccept: true);
+
+            // Enfocar el TextBox
+            dlg.Loaded += (s, e) =>
+            {
+                dlg.InputTextBox.Focus();
+                dlg.InputTextBox.SelectAll();
+            };
+
+            // Mostrar modal
+            dlg.ShowDialog();
+
+            // Devolver el valor ingresado solo si presionó OK
+            if (dlg._result == CustomMessageBoxResult.OK)
+            {
+                return dlg.InputTextBox.Text;
+            }
+
+            return null;
+        }
+
         // Helpers para configurar botones
         private void ShowPrimary(string text, CustomMessageBoxResult result, bool isAccept = false)
         {
@@ -98,6 +160,7 @@ namespace TaskyPad
                 if (e.Key == System.Windows.Input.Key.Enter)
                 {
                     (btn as System.Windows.Controls.Button)?.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Primitives.ButtonBase.ClickEvent));
+                    e.Handled = true;
                 }
             };
             (btn as System.Windows.Controls.Button).IsDefault = true;
@@ -110,6 +173,7 @@ namespace TaskyPad
                 if (e.Key == System.Windows.Input.Key.Escape)
                 {
                     (btn as System.Windows.Controls.Button)?.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Primitives.ButtonBase.ClickEvent));
+                    e.Handled = true;
                 }
             };
             (btn as System.Windows.Controls.Button).IsCancel = true;

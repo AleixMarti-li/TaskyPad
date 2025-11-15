@@ -123,7 +123,8 @@ namespace TaskyPad
             if (!Directory.Exists("notas")) {
                 Directory.CreateDirectory("notas");
             }
-            string nombreNota = Interaction.InputBox("Introduce el nombre de la nota");
+
+            string nombreNota = CustomMessageBox.ShowInput(this, "Introduce el nombre de la nota", "Ingreso de datos", headerLogoPath: "pack://application:,,,/Resources/logo.ico");
             if (string.IsNullOrEmpty(nombreNota)) return;
             File.WriteAllText($"notas\\{nombreNota}.txt", @"{\rtf1\ansi }");
             RecuperarNotas();

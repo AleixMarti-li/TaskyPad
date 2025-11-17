@@ -42,6 +42,12 @@ namespace TaskyPad
         private NotificationService notificationService;
         private TaskService taskService;
         private ConfigService configService;
+        
+        // Drag and drop fields
+        private Tarea? _draggedTask = null;
+        private System.Windows.Point _dragStartPoint;
+        private bool _isDragging = false;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -261,6 +267,11 @@ namespace TaskyPad
             PanelTareasInProgress.Children.Clear();
             PanelTareasDone.Children.Clear();
 
+            // Setup drop targets
+            SetupDropPanel(PanelTareasNone, EstadoTarea.None);
+            SetupDropPanel(PanelTareasInProgress, EstadoTarea.InProgress);
+            SetupDropPanel(PanelTareasDone, EstadoTarea.Done);
+
             var tareasDivididas = new
             {
                 None = taskService._listaTareas.Where(t => t.estado == EstadoTarea.None).ToList(),
@@ -315,6 +326,36 @@ namespace TaskyPad
                     Opacity = 0.15,
                     Color = System.Windows.Media.Colors.Black
                 }
+            };
+
+            // Drag and drop events
+            cardBorder.MouseLeftButtonDown += (s, e) =>
+            {
+                _dragStartPoint = e.GetPosition(null);
+                _draggedTask = item;
+            };
+
+            cardBorder.MouseMove += (s, e) =>
+            {
+                if (e.LeftButton == MouseButtonState.Pressed && _draggedTask == item)
+                {
+                    System.Windows.Point currentPosition = e.GetPosition(null);
+                    System.Windows.Vector diff = _dragStartPoint - currentPosition;
+
+                    if (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance ||
+                        Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance)
+                    {
+                        _isDragging = true;
+                        System.Windows.DataObject dragData = new System.Windows.DataObject(System.Windows.DataFormats.Serializable, item);
+                        System.Windows.DragDrop.DoDragDrop(cardBorder, dragData, System.Windows.DragDropEffects.Move);
+                    }
+                }
+            };
+
+            cardBorder.MouseLeftButtonUp += (s, e) =>
+            {
+                _isDragging = false;
+                _draggedTask = null;
             };
 
             Grid mainGrid = new Grid();
@@ -561,6 +602,50 @@ namespace TaskyPad
             ventanaConfigruacion.Title = "Configuración";
             this.Hide();
             ventanaConfigruacion.ShowDialog();
+        }
+
+        // Drag and Drop helper methods
+        private void SetupDropPanel(StackPanel panel, EstadoTarea targetStatus)
+        {
+            panel.AllowDrop = true;
+
+            panel.DragEnter += (s, e) =>
+            {
+                if (e.Data.GetDataPresent(System.Windows.DataFormats.Serializable))
+                {
+                    e.Effects = System.Windows.DragDropEffects.Move;
+                }
+                else
+                {
+                    e.Effects = System.Windows.DragDropEffects.None;
+                }
+                e.Handled = true;
+            };
+
+            panel.DragOver += (s, e) =>
+            {
+                if (e.Data.GetDataPresent(System.Windows.DataFormats.Serializable))
+                {
+                    e.Effects = System.Windows.DragDropEffects.Move;
+                }
+                else
+                {
+                    e.Effects = System.Windows.DragDropEffects.None;
+                }
+                e.Handled = true;
+            };
+
+            panel.Drop += (s, e) =>
+            {
+                if (e.Data.GetData(System.Windows.DataFormats.Serializable) is Tarea draggedTask)
+                {
+                    if (draggedTask.estado != targetStatus)
+                    {
+                        CambiarEstadoTarea(draggedTask, targetStatus);
+                    }
+                }
+                e.Handled = true;
+            };
         }
     }
 }

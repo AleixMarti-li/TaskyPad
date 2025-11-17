@@ -17,10 +17,12 @@ namespace TaskyPad
         private Dictionary<string, System.Timers.Timer> tasksDictionary = new Dictionary<string, System.Timers.Timer>();
         private NotificationService _notificationService;
         private ConfigService _configService;
-        public TaskService(NotificationService notificationService, ConfigService configService)
+        private MainWindow _mainWindow;
+        public TaskService(MainWindow mainWindow, NotificationService notificationService, ConfigService configService)
         {
             _notificationService = notificationService;
             _configService = configService;
+            _mainWindow = mainWindow;
         }
 
         public TaskService()
@@ -240,9 +242,17 @@ namespace TaskyPad
 
             if (EncryptEnabled && RecoveryKey is not null && _configService?._configuracion.passwordEncrypt is not null)
             {
-                conteindoJSON = Crypto.Decrypt(conteindoJSON, _configService._configuracion.passwordEncrypt);
+                if(Crypto.Decrypt(conteindoJSON, _configService._configuracion.passwordEncrypt, out string? Result))
+                {
+                    conteindoJSON = Result ?? string.Empty;
+                } else
+                {
+                    //show error decrypt
+                    CustomMessageBox.ShowConfirmation(_mainWindow, "Error al descifrar las tareas. Es posible que la contraseña de cifrado sea incorrecta.", "Error de Descifrado", CustomMessageBoxButton.OK);
+                    _listaTareas = new List<Tarea>();
+                    return;
+                }
             }
-
 
             List<Tarea>? tareasRecuperadas = JsonSerializer.Deserialize<List<Tarea>>(conteindoJSON);
             _listaTareas = tareasRecuperadas ?? new List<Tarea>();
@@ -270,7 +280,16 @@ namespace TaskyPad
 
             if (EncryptEnabled && RecoveryKey is not null && _configService?._configuracion.passwordEncrypt is not null)
             {
-                json = Crypto.Encrypt(json, _configService._configuracion.passwordEncrypt);
+                if (Crypto.Encrypt(json, _configService._configuracion.passwordEncrypt, out string? Result))
+                {
+                    if (Result is not null)
+                        json = Result;
+                } else
+                {
+                    // Falló el cifrado, manejar el error según sea necesario
+                    CustomMessageBox.ShowConfirmation(_mainWindow, "Error al cifrar las tareas. Los cambios no se guardarán.", "Error de Cifrado", CustomMessageBoxButton.OK);
+                    return;
+                }
             }
 
             File.WriteAllText(LoadTareasPath(), json);

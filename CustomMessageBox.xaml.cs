@@ -22,7 +22,7 @@ namespace TaskyPad
             CustomMessageBoxButton buttons = CustomMessageBoxButton.OK, string iconPath = null, string headerLogoPath = null)
         {
             var dlg = new CustomMessageBox();
-            if (owner != null) dlg.Owner = owner;
+            //if (owner != null) dlg.Owner = owner;
 
             dlg.TxtMessage.Text = message ?? "";
             dlg.TxtTitle.Text = title ?? "";
@@ -66,6 +66,39 @@ namespace TaskyPad
             dlg.ShowDialog();
             return dlg._result;
         }
+
+        // Método estático para mostrar un diálogo con solo el botón OK
+        public static CustomMessageBoxResult ShowOkDialog(Window owner, string message, string title = "",
+            string iconPath = null, string headerLogoPath = null)
+        {
+            var dlg = new CustomMessageBox();
+            if (owner != null) dlg.Owner = owner;
+
+            dlg.TxtMessage.Text = message ?? "";
+            dlg.TxtTitle.Text = title ?? "";
+
+            // Icono principal (opcional)
+            if (!string.IsNullOrEmpty(iconPath))
+            {
+                dlg.IconImage.Source = new System.Windows.Media.Imaging.BitmapImage(new Uri(iconPath, UriKind.RelativeOrAbsolute));
+                dlg.IconImage.Visibility = Visibility.Visible;
+            }
+
+            // Logo en el header (opcional)
+            if (!string.IsNullOrEmpty(headerLogoPath))
+            {
+                dlg.LogoHeader.Source = new System.Windows.Media.Imaging.BitmapImage(new Uri(headerLogoPath, UriKind.RelativeOrAbsolute));
+                dlg.LogoHeader.Visibility = Visibility.Visible;
+            }
+
+            // Solo botón OK
+            dlg.ShowPrimary("OK", CustomMessageBoxResult.OK, isAccept: true);
+
+            // Mostrar modal
+            dlg.ShowDialog();
+            return dlg._result;
+        }
+
 
         // Método estático para mostrar el diálogo de entrada de texto
         public static string ShowInput(Window owner, string message, string title = "", 

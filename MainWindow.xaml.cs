@@ -67,7 +67,7 @@ namespace TaskyPad
 
         private void CreateTaskService()
         {
-            taskService = new TaskService(notificationService, configService);
+            taskService = new TaskService(this, notificationService, configService);
             taskService.InicializeTimers();
         }
         private async void CheckVersion()

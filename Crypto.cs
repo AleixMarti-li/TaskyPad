@@ -15,45 +15,62 @@ namespace TaskyPad
             return pbkdf2.GetBytes(32); // AES-256 key
         }
 
-        public static string Encrypt(string plainText, string masterKey)
+        public static bool Encrypt(string plainText, string masterKey, out string? result)
         {
-            using var aes = Aes.Create();
-            aes.GenerateIV();
-            aes.GenerateKey();
+            try
+            {
+                using var aes = Aes.Create();
+                aes.GenerateIV();
+                aes.GenerateKey();
 
-            var salt = RandomNumberGenerator.GetBytes(16);
-            var key = GetKey(masterKey, salt);
+                var salt = RandomNumberGenerator.GetBytes(16);
+                var key = GetKey(masterKey, salt);
 
-            aes.Key = key;
+                aes.Key = key;
 
-            using var encryptor = aes.CreateEncryptor();
-            var bytes = Encoding.UTF8.GetBytes(plainText);
-            var cipherBytes = encryptor.TransformFinalBlock(bytes, 0, bytes.Length);
+                using var encryptor = aes.CreateEncryptor();
+                var bytes = Encoding.UTF8.GetBytes(plainText);
+                var cipherBytes = encryptor.TransformFinalBlock(bytes, 0, bytes.Length);
 
-            // Guardamos: SALT + IV + DATA
-            var final = salt.Concat(aes.IV).Concat(cipherBytes).ToArray();
+                // Guardamos: SALT + IV + DATA
+                var final = salt.Concat(aes.IV).Concat(cipherBytes).ToArray();
 
-            return Convert.ToBase64String(final);
+                result = Convert.ToBase64String(final);
+                return true;
+            }
+            catch (Exception)
+            {
+                result = null;
+                return false;
+            }
         }
 
-        public static string Decrypt(string encryptedText, string masterKey)
+        public static bool Decrypt(string encryptedText, string masterKey, out string? result)
         {
-            var fullData = Convert.FromBase64String(encryptedText);
+            try
+            {
+                var fullData = Convert.FromBase64String(encryptedText);
 
-            var salt = fullData.Take(16).ToArray();
-            var iv = fullData.Skip(16).Take(16).ToArray();
-            var cipherData = fullData.Skip(32).ToArray();
+                var salt = fullData.Take(16).ToArray();
+                var iv = fullData.Skip(16).Take(16).ToArray();
+                var cipherData = fullData.Skip(32).ToArray();
 
-            var key = GetKey(masterKey, salt);
+                var key = GetKey(masterKey, salt);
 
-            using var aes = Aes.Create();
-            aes.Key = key;
-            aes.IV = iv;
+                using var aes = Aes.Create();
+                aes.Key = key;
+                aes.IV = iv;
 
-            using var decryptor = aes.CreateDecryptor();
-            var result = decryptor.TransformFinalBlock(cipherData, 0, cipherData.Length);
-
-            return Encoding.UTF8.GetString(result);
+                using var decryptor = aes.CreateDecryptor();
+                var _result = decryptor.TransformFinalBlock(cipherData, 0, cipherData.Length);
+                result = Encoding.UTF8.GetString(_result);
+                return true;
+            }
+            catch (Exception)
+            {
+                result = null;
+                return false;
+            }
         }
     }
 }

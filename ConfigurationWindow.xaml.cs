@@ -25,29 +25,45 @@ namespace TaskyPad
     {
         public MainWindow _ventanaPrincipal;
         public string _dataPath;
-        public Config _configuracion;
+        public Config? _configuracion;
         public ConfigurationWindow(MainWindow ventanaPrincipal)
         {
             InitializeComponent();
             _ventanaPrincipal = ventanaPrincipal;
+            _dataPath = LoadConfigPath();
             LoadConfigJSON();
-
+            LoadConfigUI();
         }
+
+        private void LoadConfigUI()
+        {
+            if (_configuracion is null) return;
+
+            CheckStartOnWindowsStart.IsChecked = _configuracion.iniciarAuto;
+        }
+
         protected override void OnClosing(CancelEventArgs e)
         {
             _ventanaPrincipal.Show();
             base.OnClosing(e);
         }
 
-        public void LoadConfigJSON() 
+        private string LoadConfigPath()
         {
-            _dataPath = System.IO.Path.Combine(
+            return System.IO.Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "TaskyPad",
                 "Configuration"
             );
+        }
 
-            if (!File.Exists($"{_dataPath}\\configuration.json")) return;
+        public void LoadConfigJSON() 
+        {
+            if (!File.Exists($"{_dataPath}\\configuration.json"))
+            {
+                _configuracion = new Config();
+                return;
+            }
 
             string conteindoJSON = File.ReadAllText($"{_dataPath}\\configuration.json");
 
@@ -59,8 +75,33 @@ namespace TaskyPad
         }
 
         public void SaveConfigJSON(Config guardarConfig) 
-        { 
-            
+        {
+            string PathFile = System.IO.Path.Combine(_dataPath, "configuration.json");
+
+            if (!Directory.Exists(_dataPath))
+            {
+                Directory.CreateDirectory(_dataPath);
+            }
+
+            if (!File.Exists(PathFile))
+            {
+                File.Create(PathFile).Dispose();
+            }
+
+            string json = JsonSerializer.Serialize(guardarConfig);
+            File.WriteAllText(PathFile, json);
+        }
+
+        private void CheckStartOnWindowsStart_Click(object sender, RoutedEventArgs e)
+        {
+            if (_configuracion is null) return;
+            bool? checkStart = CheckStartOnWindowsStart.IsChecked;
+            if (checkStart.HasValue)
+            {
+                _configuracion.iniciarAuto = checkStart.Value;
+            }
+
+            SaveConfigJSON(_configuracion);
         }
     }
 }

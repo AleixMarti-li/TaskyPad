@@ -8,8 +8,8 @@ namespace TaskyPad
 {
     public class Config
     {
-        public bool iniciarAuto = false;
+        public bool iniciarAuto { get; set; } = false;
 
-        public string? contrasena;
+        public string? contrasena { get; set; }
     }
 }

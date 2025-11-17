@@ -36,40 +36,53 @@ namespace TaskyPad
     public partial class MainWindow : Window
     {
         private string[] _listaNotas = new string[0]; 
-        private Forms.NotifyIcon _TrayIcon;
+        private Forms.NotifyIcon? _TrayIcon;
         private UpdateManager updateManager;
         private returnMessageUpdateInfo _updateManagerResponse;
         private NotificationService notificationService;
-        private TaskService? taskService;
+        private TaskService taskService;
         private ConfigService configService;
         public MainWindow()
         {
             InitializeComponent();
-            CreateConfigService();
-            CreateNotificationService();
-            CreateTaskService();
-            loadTrayIcon();
+            updateManager = CreateUpdateManager();
+            configService = CreateConfigService();
+            notificationService = CreateNotificationService();
+            _updateManagerResponse = LoadUpdateManagerResponse().GetAwaiter().GetResult();
+            taskService = CreateTaskService();
+            _TrayIcon = loadTrayIcon();
             AddVersionAppUI();
             RecuperarNotas();
             LoadTareas();
 
-            updateManager = new UpdateManager();
             CheckVersion();
         }
-        private void CreateNotificationService()
+        private NotificationService CreateNotificationService()
         {
-            notificationService = new NotificationService();
+            return new NotificationService();
         }
-        private void CreateConfigService()
+        private ConfigService CreateConfigService()
         {
-            configService = new ConfigService();
+            return new ConfigService();
         }
 
-        private void CreateTaskService()
+        private UpdateManager CreateUpdateManager()
         {
-            taskService = new TaskService(this, notificationService, configService);
-            taskService.InicializeTimers();
+            return new UpdateManager();
         }
+
+        private TaskService CreateTaskService()
+        {
+            TaskService _taskService = new TaskService(this, notificationService, configService);
+            _taskService.InicializeTimers();
+            return _taskService;
+        }
+
+        private async Task<returnMessageUpdateInfo> LoadUpdateManagerResponse()
+        {
+            return await updateManager.CheckActualizacionDisponible();
+        }
+
         private async void CheckVersion()
         {
             _updateManagerResponse = await updateManager.CheckActualizacionDisponible();
@@ -102,9 +115,9 @@ namespace TaskyPad
 #endif
         }
 
-        private void loadTrayIcon() 
+        private Forms.NotifyIcon loadTrayIcon() 
         {
-            _TrayIcon = new Forms.NotifyIcon();
+            Forms.NotifyIcon _TrayIcon = new Forms.NotifyIcon();
             _TrayIcon.Visible = false;
             _TrayIcon.Text = "TaskyPad";
             _TrayIcon.Icon = new Icon("Resources\\logo.ico");
@@ -127,6 +140,8 @@ namespace TaskyPad
                 this.Show();
                 this.WindowState = WindowState.Normal;
             };
+
+            return _TrayIcon;
         }
 
         private void BtnCrearNotas_Click(object sender, RoutedEventArgs e)
@@ -135,7 +150,7 @@ namespace TaskyPad
                 Directory.CreateDirectory("notas");
             }
 
-            string nombreNota = CustomMessageBox.ShowInput(this, "Introduce el nombre de la nota", "Ingreso de datos", headerLogoPath: "pack://application:,,,/Resources/logo.ico");
+            string? nombreNota = CustomMessageBox.ShowInput(this, "Introduce el nombre de la nota", "Ingreso de datos", headerLogoPath: "pack://application:,,,/Resources/logo.ico");
             if (string.IsNullOrEmpty(nombreNota)) return;
             File.WriteAllText($"notas\\{nombreNota}.txt", @"{\rtf1\ansi }");
             RecuperarNotas();
@@ -199,8 +214,9 @@ namespace TaskyPad
 
         private void BtnNota_Click(object sender, RoutedEventArgs e)
         {
-            string contenido = ((System.Windows.Controls.ContentControl)sender).Content.ToString();
+            string? contenido = ((System.Windows.Controls.ContentControl)sender).Content.ToString();
             // Remover el emoji "📄 " del nombre
+            if (contenido is null) return;
             string nombre = contenido.Replace("📄 ", "").Trim();
             EditorNota ventanaEditor = new EditorNota(nombre, this);
             ventanaEditor.Title = $"Editando la nota - {nombre}";

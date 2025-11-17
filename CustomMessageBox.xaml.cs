@@ -19,7 +19,7 @@ namespace TaskyPad
 
         // Método estático para mostrar el diálogo de confirmación (síncrono, devuelve resultado)
         public static CustomMessageBoxResult ShowConfirmation(Window owner, string message, string title = "",
-            CustomMessageBoxButton buttons = CustomMessageBoxButton.OK, string iconPath = null, string headerLogoPath = null)
+            CustomMessageBoxButton buttons = CustomMessageBoxButton.OK, string? iconPath = null, string? headerLogoPath = null)
         {
             var dlg = new CustomMessageBox();
             //if (owner != null) dlg.Owner = owner;
@@ -69,7 +69,7 @@ namespace TaskyPad
 
         // Método estático para mostrar un diálogo con solo el botón OK
         public static CustomMessageBoxResult ShowOkDialog(Window owner, string message, string title = "",
-            string iconPath = null, string headerLogoPath = null)
+            string? iconPath = null, string? headerLogoPath = null)
         {
             var dlg = new CustomMessageBox();
             if (owner != null) dlg.Owner = owner;
@@ -101,8 +101,8 @@ namespace TaskyPad
 
 
         // Método estático para mostrar el diálogo de entrada de texto
-        public static string ShowInput(Window owner, string message, string title = "", 
-            string defaultValue = "", string inputLabel = "", string iconPath = null, string headerLogoPath = null)
+        public static string? ShowInput(Window owner, string message, string title = "", 
+            string defaultValue = "", string inputLabel = "", string? iconPath = null, string? headerLogoPath = null)
         {
             var dlg = new CustomMessageBox();
             dlg._isInputMode = true;

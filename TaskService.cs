@@ -25,11 +25,6 @@ namespace TaskyPad
             _mainWindow = mainWindow;
         }
 
-        public TaskService()
-        {
-            _notificationService = new NotificationService();
-        }
-
         public void ExecuteAction(string taskId, string action)
         {
             Tarea? TareaSeleccionada = _listaTareas.FirstOrDefault(t => t.idTarea == taskId);

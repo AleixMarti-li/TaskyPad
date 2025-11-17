@@ -530,5 +530,13 @@ namespace TaskyPad
         public void ExecuteTaskAction(String taskId, String action) {
             taskService?.ExecuteAction(taskId, action);
         }
+
+        private void BtnConfig_Click(object sender, RoutedEventArgs e)
+        {
+            ConfigurationWindow ventanaConfigruacion = new ConfigurationWindow(this);
+            ventanaConfigruacion.Title = "Configuración";
+            this.Hide();
+            ventanaConfigruacion.ShowDialog();
+        }
     }
 }

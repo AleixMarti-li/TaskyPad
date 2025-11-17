@@ -29,7 +29,7 @@
 
         <!-- Font Family -->
         <FontFamily x:Key="PrimaryFont">Segoe UI, Arial, sans-serif</FontFamily>
-        
+
         <!-- Shadows -->
         <DropShadowEffect x:Key="SoftShadow" Color="#000000" BlurRadius="6" Opacity="0.1" ShadowDepth="2"/>
         <DropShadowEffect x:Key="MediumShadow" Color="#000000" BlurRadius="12" Opacity="0.15" ShadowDepth="4"/>
@@ -152,6 +152,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
                 <!-- Logo and Title -->
@@ -174,9 +175,13 @@
                     </StackPanel>
                 </StackPanel>
 
+                <Button x:Name="BtnConfig" Margin="1034,0,0,0" Click="BtnConfig_Click">
+                    <TextBlock>Configuración</TextBlock>
+                </Button>
+
                 <!-- Update Button -->
                 <Button x:Name="ButtonUpdateVersion"
-                       Grid.Column="1"
+                       Grid.Column="2"
                        Padding="16,8"
                        Margin="20,0,0,0"
                        Visibility="Hidden"

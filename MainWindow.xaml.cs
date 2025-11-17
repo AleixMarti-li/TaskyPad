@@ -41,6 +41,7 @@ namespace TaskyPad
         private returnMessageUpdateInfo _updateManagerResponse;
         private NotificationService notificationService;
         private TaskService? taskService;
+        private ConfigService configService;
         public MainWindow()
         {
             InitializeComponent();
@@ -50,7 +51,8 @@ namespace TaskyPad
             AddVersionAppUI();
             RecuperarNotas();
             LoadTareas();
-            
+            CreateConfigService();
+
             updateManager = new UpdateManager();
             CheckVersion();
         }
@@ -58,9 +60,14 @@ namespace TaskyPad
         {
             notificationService = new NotificationService();
         }
+        private void CreateConfigService()
+        {
+            configService = new ConfigService();
+        }
+
         private void CreateTaskService()
         {
-            taskService = new TaskService(notificationService);
+            taskService = new TaskService(notificationService, configService);
             taskService.InicializeTimers();
         }
         private async void CheckVersion()
@@ -533,7 +540,8 @@ namespace TaskyPad
 
         private void BtnConfig_Click(object sender, RoutedEventArgs e)
         {
-            ConfigurationWindow ventanaConfigruacion = new ConfigurationWindow(this);
+            if (configService is null) return;
+            ConfigurationWindow ventanaConfigruacion = new ConfigurationWindow(this, configService);
             ventanaConfigruacion.Title = "Configuración";
             this.Hide();
             ventanaConfigruacion.ShowDialog();

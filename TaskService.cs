@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
+using System.Security.Cryptography;
 
 namespace TaskyPad
 {
@@ -15,9 +16,11 @@ namespace TaskyPad
         public List<Tarea> _listaTareas = new List<Tarea>();
         private Dictionary<string, System.Timers.Timer> tasksDictionary = new Dictionary<string, System.Timers.Timer>();
         private NotificationService _notificationService;
-        public TaskService(NotificationService notificationService)
+        private ConfigService _configService;
+        public TaskService(NotificationService notificationService, ConfigService configService)
         {
             _notificationService = notificationService;
+            _configService = configService;
         }
 
         public TaskService()
@@ -199,6 +202,17 @@ namespace TaskyPad
 
         private void LoadTareasInternos()
         {
+            string? RecoveryKey = null;
+            bool EncryptEnabled = false;
+            if (_configService is not null)
+            {
+                if (_configService._configuracion.enableEncrypt)
+                {
+                    EncryptEnabled = true;
+                    RecoveryKey = _configService._configuracion.passwordEncrypt;
+                }
+            }
+
             if (!Directory.Exists("tareas")) Directory.CreateDirectory("tareas");
             if (!File.Exists("tareas\\tasks.json"))
             {
@@ -210,6 +224,13 @@ namespace TaskyPad
                 _listaTareas = new List<Tarea>();
                 return;
             }
+
+            if (EncryptEnabled && RecoveryKey is not null && _configService._configuracion.passwordEncrypt is not null)
+            {
+                conteindoJSON = Crypto.Decrypt(conteindoJSON, _configService._configuracion.passwordEncrypt);
+            }
+
+
             List<Tarea>? tareasRecuperadas = JsonSerializer.Deserialize<List<Tarea>>(conteindoJSON);
             _listaTareas = tareasRecuperadas ?? new List<Tarea>();
         }

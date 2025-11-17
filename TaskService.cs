@@ -200,6 +200,19 @@ namespace TaskyPad
             return _listaTareas;
         }
 
+        public string LoadTareasPath()
+        {
+            string folder = System.IO.Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "TaskyPad",
+                "Tasks"
+            );
+            if (!Directory.Exists(folder))
+                Directory.CreateDirectory(folder);
+
+            return Path.Combine(folder, "tasks.json");
+        }
+
         private void LoadTareasInternos()
         {
             string? RecoveryKey = null;
@@ -214,18 +227,18 @@ namespace TaskyPad
             }
 
             if (!Directory.Exists("tareas")) Directory.CreateDirectory("tareas");
-            if (!File.Exists("tareas\\tasks.json"))
+            if (!File.Exists(LoadTareasPath()))
             {
-                using (File.Create("tareas\\tasks.json")) { }
+                using (File.Create(LoadTareasPath())) { }
             }
-            string conteindoJSON = File.ReadAllText("tareas\\tasks.json");
+            string conteindoJSON = File.ReadAllText(LoadTareasPath());
             if (string.IsNullOrEmpty(conteindoJSON))
             {
                 _listaTareas = new List<Tarea>();
                 return;
             }
 
-            if (EncryptEnabled && RecoveryKey is not null && _configService._configuracion.passwordEncrypt is not null)
+            if (EncryptEnabled && RecoveryKey is not null && _configService?._configuracion.passwordEncrypt is not null)
             {
                 conteindoJSON = Crypto.Decrypt(conteindoJSON, _configService._configuracion.passwordEncrypt);
             }
@@ -238,12 +251,29 @@ namespace TaskyPad
         public void SaveTareas(List<Tarea> tareas)
         {
             if (!Directory.Exists("tareas")) Directory.CreateDirectory("tareas");
-            if (!File.Exists("tareas\\tasks.json"))
+            if (!File.Exists(LoadTareasPath()))
             {
-                using (File.Create("tareas\\tasks.json")) { }
+                using (File.Create(LoadTareasPath())) { }
             }
             string json = JsonSerializer.Serialize(tareas);
-            File.WriteAllText("tareas\\tasks.json", json);
+
+            string? RecoveryKey = null;
+            bool EncryptEnabled = false;
+            if (_configService is not null)
+            {
+                if (_configService._configuracion.enableEncrypt)
+                {
+                    EncryptEnabled = true;
+                    RecoveryKey = _configService._configuracion.passwordEncrypt;
+                }
+            }
+
+            if (EncryptEnabled && RecoveryKey is not null && _configService?._configuracion.passwordEncrypt is not null)
+            {
+                json = Crypto.Encrypt(json, _configService._configuracion.passwordEncrypt);
+            }
+
+            File.WriteAllText(LoadTareasPath(), json);
             _listaTareas = tareas;
         }
 

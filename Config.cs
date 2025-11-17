@@ -10,7 +10,7 @@ namespace TaskyPad
     {
         public bool iniciarAuto { get; set; } = false;
 
-        public bool enableEncrypt { get; set; } = false;
-        public string? passwordEncrypt { get; set; }
+        public bool enableEncrypt { get; set; } = true;
+        public string? passwordEncrypt { get; set; } = "123";
     }
 }

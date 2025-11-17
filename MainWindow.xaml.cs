@@ -45,13 +45,13 @@ namespace TaskyPad
         public MainWindow()
         {
             InitializeComponent();
+            CreateConfigService();
             CreateNotificationService();
             CreateTaskService();
             loadTrayIcon();
             AddVersionAppUI();
             RecuperarNotas();
             LoadTareas();
-            CreateConfigService();
 
             updateManager = new UpdateManager();
             CheckVersion();

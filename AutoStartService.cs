@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 
-namespace TaskyPad.Services
+namespace TaskyPad
 {
     public class AutoStartService
     {

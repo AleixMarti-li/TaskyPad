@@ -175,13 +175,9 @@
                     </StackPanel>
                 </StackPanel>
 
-                <Button x:Name="BtnConfig" Margin="1034,0,0,0" Click="BtnConfig_Click">
-                    <TextBlock>Configuración</TextBlock>
-                </Button>
-
                 <!-- Update Button -->
                 <Button x:Name="ButtonUpdateVersion"
-                       Grid.Column="2"
+                       Grid.Column="1"
                        Padding="16,8"
                        Margin="20,0,0,0"
                        Visibility="Hidden"
@@ -193,6 +189,41 @@
                                   Text="Actualización disponible" 
                                   VerticalAlignment="Center"/>
                     </StackPanel>
+                </Button>
+
+                <Button x:Name="BtnConfig" 
+                   Grid.Column="2"
+                   Padding="12,8"
+                   Margin="20,0,0,0"
+                   Click="BtnConfig_Click"
+                   Style="{StaticResource PrimaryButtonStyle}"
+                   ToolTip="Abrir configuración"
+                   Background="Transparent"
+                   Foreground="#BDC3C7">    
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Grid>
+                                <Border x:Name="hoverBorder"
+                       Background="Transparent"
+                       CornerRadius="8"
+                       Padding="8"/>
+                                <TextBlock Text="⚙️" 
+                          FontSize="24"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"
+                          x:Name="gearIcon"/>
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="hoverBorder" Property="Background" Value="#34495E"/>
+                                    <Setter TargetName="gearIcon" Property="Opacity" Value="1"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="hoverBorder" Property="Background" Value="#2C3E50"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
                 </Button>
             </Grid>
         </Border>

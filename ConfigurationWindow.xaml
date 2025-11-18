@@ -5,9 +5,382 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TaskyPad"
         mc:Ignorable="d"
-        Title="ConfigurationWindow" Height="450" Width="800">
-    <Grid>
-        <CheckBox x:Name="CheckStartOnWindowsStart" Content="Iniciar con inicio de sistema operativo" HorizontalAlignment="Left" Margin="166,156,0,0" VerticalAlignment="Top" Click="CheckStartOnWindowsStart_Click"/>
-        <CheckBox x:Name="CheckEnableEncrypt" Content="Habilitar encriptación" HorizontalAlignment="Left" Margin="212,119,0,0" VerticalAlignment="Top" Click="CheckEnableEncrypt_Click"/>
+        Title="Configuración de TaskyPad" 
+        Height="700" 
+        Width="900"
+        WindowStartupLocation="CenterOwner"
+        Background="#ECF0F1"
+        FontFamily="Segoe UI, Arial, sans-serif"
+        MinHeight="600"
+        MinWidth="700">
+    <Window.Resources>
+        <!-- Color Palette -->
+        <SolidColorBrush x:Key="PrimaryColor" Color="#2C3E50"/>
+        <SolidColorBrush x:Key="SecondaryColor" Color="#3498DB"/>
+        <SolidColorBrush x:Key="SuccessColor" Color="#27AE60"/>
+        <SolidColorBrush x:Key="WarningColor" Color="#F39C12"/>
+        <SolidColorBrush x:Key="DangerColor" Color="#E74C3C"/>
+        <SolidColorBrush x:Key="BackgroundColor" Color="#ECF0F1"/>
+        <SolidColorBrush x:Key="CardBackground" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="TextDark" Color="#2C3E50"/>
+        <SolidColorBrush x:Key="TextLight" Color="#95A5A6"/>
+        <SolidColorBrush x:Key="BorderColor" Color="#D5DBDB"/>
+        <SolidColorBrush x:Key="ShadowColor" Color="#000000"/>
+
+        <!-- Font Family -->
+        <FontFamily x:Key="PrimaryFont">Segoe UI, Arial, sans-serif</FontFamily>
+
+        <!-- Shadows -->
+        <DropShadowEffect x:Key="SoftShadow" Color="#000000" BlurRadius="6" Opacity="0.1" ShadowDepth="2"/>
+        <DropShadowEffect x:Key="MediumShadow" Color="#000000" BlurRadius="12" Opacity="0.15" ShadowDepth="4"/>
+        <DropShadowEffect x:Key="HardShadow" Color="#000000" BlurRadius="20" Opacity="0.2" ShadowDepth="6"/>
+
+        <!-- Checkbox Style -->
+        <Style x:Key="ModernCheckBoxStyle" TargetType="CheckBox">
+            <Setter Property="FontFamily" Value="{StaticResource PrimaryFont}"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="{StaticResource TextDark}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Padding" Value="8,0,0,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <StackPanel Orientation="Horizontal">
+                            <Border x:Name="CheckBoxBorder"
+                                    Width="24"
+                                    Height="24"
+                                    CornerRadius="4"
+                                    Background="White"
+                                    BorderBrush="{StaticResource BorderColor}"
+                                    BorderThickness="2"
+                                    Padding="0"
+                                    Effect="{StaticResource SoftShadow}">
+                                <TextBlock x:Name="CheckMark"
+                                          Text="✓"
+                                          FontSize="16"
+                                          FontWeight="Bold"
+                                          Foreground="White"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          Visibility="Hidden"/>
+                            </Border>
+                            <ContentPresenter Margin="{TemplateBinding Padding}"
+                                             VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="CheckBoxBorder" Property="BorderBrush" Value="{StaticResource SecondaryColor}"/>
+                                <Setter TargetName="CheckBoxBorder" Property="Effect" Value="{StaticResource MediumShadow}"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="CheckBoxBorder" Property="Background" Value="{StaticResource SecondaryColor}"/>
+                                <Setter TargetName="CheckBoxBorder" Property="BorderBrush" Value="{StaticResource SecondaryColor}"/>
+                                <Setter TargetName="CheckMark" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Primary Button Style -->
+        <Style x:Key="PrimaryButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource SecondaryColor}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontFamily" Value="{StaticResource PrimaryFont}"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="16,10"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Effect" Value="{StaticResource SoftShadow}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8"
+                                SnapsToDevicePixels="True">
+                            <ContentPresenter x:Name="contentPresenter"
+                                             Margin="{TemplateBinding Padding}"
+                                             HorizontalAlignment="Center"
+                                             VerticalAlignment="Center"
+                                             RecognizesAccessKey="True"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#2980B9"/>
+                                <Setter Property="Effect" Value="{StaticResource MediumShadow}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#1F618D"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Card Style -->
+        <Style x:Key="CardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource CardBackground}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="24"/>
+            <Setter Property="Effect" Value="{StaticResource SoftShadow}"/>
+        </Style>
+
+        <!-- Section Title Style -->
+        <Style x:Key="SectionTitleStyle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource PrimaryFont}"/>
+            <Setter Property="FontSize" Value="28"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{StaticResource TextDark}"/>
+            <Setter Property="Margin" Value="0"/>
+        </Style>
+
+        <!-- Subtitle Style -->
+        <Style x:Key="SubtitleStyle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource PrimaryFont}"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="{StaticResource TextLight}"/>
+            <Setter Property="Margin" Value="0,4,0,0"/>
+        </Style>
+
+        <!-- Option Title Style -->
+        <Style x:Key="OptionTitleStyle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource PrimaryFont}"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{StaticResource TextDark}"/>
+            <Setter Property="Margin" Value="0"/>
+        </Style>
+
+        <!-- Description Style -->
+        <Style x:Key="DescriptionStyle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource PrimaryFont}"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="{StaticResource TextLight}"/>
+            <Setter Property="Margin" Value="0,6,0,0"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="LineHeight" Value="19"/>
+            <Setter Property="LineStackingStrategy" Value="BlockLineHeight"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Background="#ECF0F1">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- ===== HEADER ===== -->
+        <Border Grid.Row="0" Background="{StaticResource PrimaryColor}" Padding="0">
+            <Grid Margin="32,28,32,28" VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="⚙️" 
+                              FontSize="36" 
+                              Margin="0,0,16,0"
+                              VerticalAlignment="Center"/>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="Configuración" 
+                                  Style="{StaticResource SectionTitleStyle}"
+                                  Foreground="White"
+                                  FontSize="32"
+                                  Margin="0"/>
+                        <TextBlock Text="Personaliza la experiencia de TaskyPad según tus preferencias" 
+                                  Style="{StaticResource SubtitleStyle}"
+                                  Foreground="#BDC3C7"/>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <ScrollViewer Grid.Row="1" 
+                     VerticalScrollBarVisibility="Auto" 
+                     HorizontalScrollBarVisibility="Disabled"
+                     Padding="0">
+            <StackPanel Margin="32,32,32,32">
+
+                <!-- ===== SECTION 1: STARTUP ===== -->
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,24">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Icon and Content -->
+                        <StackPanel Grid.Column="0" Margin="0,0,24,0" VerticalAlignment="Top">
+                            <Border Background="#E8F4F8" 
+                                   Width="56" 
+                                   Height="56" 
+                                   CornerRadius="12"
+                                   Padding="0">
+                                <TextBlock Text="🚀" 
+                                          FontSize="28"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"/>
+                            </Border>
+                        </StackPanel>
+
+                        <!-- Details -->
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <StackPanel Margin="0,0,0,16">
+                                <TextBlock Text="Inicio automático con Windows" 
+                                          Style="{StaticResource OptionTitleStyle}"/>
+                                <TextBlock Style="{StaticResource DescriptionStyle}">
+                                    <Run Text="Activa esta opción para que TaskyPad se inicie automáticamente cuando enciendes tu computadora. Esto es útil si utilizas la aplicación a diario y deseas tenerla siempre disponible. Requiere permisos de administrador."/>
+                                </TextBlock>
+                            </StackPanel>
+
+                            <CheckBox x:Name="CheckStartOnWindowsStart" 
+                                     Content="Iniciar automáticamente con el sistema operativo"
+                                     Style="{StaticResource ModernCheckBoxStyle}"
+                                     Click="CheckStartOnWindowsStart_Click"
+                                     FontWeight="Medium"
+                                     Foreground="{StaticResource TextDark}"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- ===== SECTION 2: ENCRYPTION ===== -->
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,24">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Icon and Content -->
+                        <StackPanel Grid.Column="0" Margin="0,0,24,0" VerticalAlignment="Top">
+                            <Border Background="#F0FDF7" 
+                                   Width="56" 
+                                   Height="56" 
+                                   CornerRadius="12"
+                                   Padding="0">
+                                <TextBlock Text="🔐" 
+                                          FontSize="28"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"/>
+                            </Border>
+                        </StackPanel>
+
+                        <!-- Details -->
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <StackPanel Margin="0,0,0,16">
+                                <TextBlock Text="Cifrado de datos" 
+                                          Style="{StaticResource OptionTitleStyle}"/>
+                                <TextBlock Style="{StaticResource DescriptionStyle}">
+                                    <Run Text="Protege tus datos sensibles con encriptación avanzada. Cuando está activada, todas tus tareas y notas serán cifradas con una contraseña que solo tú conoces. "/>
+                                    <Run Text="⚠️ Recuerda guardar tu contraseña en un lugar seguro, ya que sin ella no podrás acceder a tus datos."
+                                         Foreground="#E74C3C" FontWeight="Bold"/>
+                                </TextBlock>
+                            </StackPanel>
+
+                            <CheckBox x:Name="CheckEnableEncrypt" 
+                                     Content="Habilitar cifrado de datos"
+                                     Style="{StaticResource ModernCheckBoxStyle}"
+                                     Click="CheckEnableEncrypt_Click"
+                                     FontWeight="Medium"
+                                     Foreground="{StaticResource TextDark}"
+                                     Margin="0,0,0,16"/>
+
+                            <!-- Password Change Button - Initially Hidden -->
+                            <StackPanel x:Name="PasswordChangePanel" Visibility="Collapsed" Margin="0,8,0,0">
+                                <Border Background="#FFFDF4" 
+                                       Padding="12,16" 
+                                       CornerRadius="8"
+                                       BorderBrush="#F39C12"
+                                       BorderThickness="1">
+                                    <StackPanel>
+                                        <TextBlock Text="💡 Tip: Cambiar tu contraseña de encriptación"
+                                                  FontSize="12"
+                                                  FontWeight="SemiBold"
+                                                  Foreground="#E67E22"
+                                                  Margin="0,0,0,12"/>
+                                        <TextBlock Text="Si deseas cambiar tu contraseña actual por una nueva, haz clic en el botón de abajo. Asegúrate de recordar la nueva contraseña."
+                                                  FontSize="12"
+                                                  Foreground="{StaticResource TextLight}"
+                                                  TextWrapping="Wrap"
+                                                  LineHeight="18"
+                                                  LineStackingStrategy="BlockLineHeight"
+                                                  Margin="0,0,0,12"/>
+                                        <Button x:Name="BtnGuardarContra"
+                                               Content="🔑 Cambiar contraseña"
+                                               Padding="16,10"
+                                               Style="{StaticResource PrimaryButtonStyle}"
+                                               Click="BtnGuardarContra_Click"
+                                               HorizontalAlignment="Left"
+                                               FontSize="13"/>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- ===== SECTION 3: INFO ===== -->
+                <Border Style="{StaticResource CardStyle}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Icon and Content -->
+                        <StackPanel Grid.Column="0" Margin="0,0,24,0" VerticalAlignment="Top">
+                            <Border Background="#FCF6F6" 
+                                   Width="56" 
+                                   Height="56" 
+                                   CornerRadius="12"
+                                   Padding="0">
+                                <TextBlock Text="ℹ️" 
+                                          FontSize="28"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"/>
+                            </Border>
+                        </StackPanel>
+
+                        <!-- Details -->
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="Acerca de TaskyPad" 
+                                      Style="{StaticResource OptionTitleStyle}"
+                                      Margin="0,0,0,8"/>
+                            <TextBlock Style="{StaticResource DescriptionStyle}">
+                                <Run Text="TaskyPad es un gestor de tareas y notas diseñado para mejorar tu productividad. Organiza tus proyectos, establece prioridades y nunca olvides nada importante."/>
+                            </TextBlock>
+                            <TextBlock Style="{StaticResource DescriptionStyle}" Margin="0,12,0,0">
+                                <Run Text="Versión: " FontWeight="SemiBold"/>
+                                <Run x:Name="VersionTextBlock" Text="1.0.0"/>
+                            </TextBlock>
+                            <TextBlock Style="{StaticResource DescriptionStyle}">
+                                <Run Text="Desarrollado por: " FontWeight="SemiBold"/>
+                                <Run Text="Aleix Martí"/>
+                                <Run Text="&amp;"/>
+                                <Run Text="Quim Alborch"/>
+                            </TextBlock>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Bottom Spacing -->
+                <TextBlock Margin="0,12,0,0"/>
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Window>

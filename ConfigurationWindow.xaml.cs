@@ -15,7 +15,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using TaskyPad.Services;
+using System.Reflection;
 
 namespace TaskyPad
 {
@@ -35,6 +35,14 @@ namespace TaskyPad
             _configService = configService;
             _autoStartService = new AutoStartService();
             LoadConfigUI();
+            SetApplicationVersion();
+        }
+
+        private void SetApplicationVersion()
+        {
+            Version? getVersionAssembly = Assembly.GetExecutingAssembly().GetName().Version;
+            if (getVersionAssembly is null) return;
+            VersionTextBlock.Text = $"{getVersionAssembly.Major}.{getVersionAssembly.Minor}.{getVersionAssembly.Build}";
         }
 
         private void LoadConfigUI()
@@ -43,6 +51,21 @@ namespace TaskyPad
 
             CheckStartOnWindowsStart.IsChecked = _configService._configuracion.iniciarAuto;
             CheckEnableEncrypt.IsChecked = _configService._configuracion.enableEncrypt;
+            
+            // Mostrar el panel de cambio de contraseña si el cifrado está habilitado
+            UpdatePasswordPanelVisibility();
+        }
+
+        private void UpdatePasswordPanelVisibility()
+        {
+            if (_configService._configuracion?.enableEncrypt ?? false)
+            {
+                //PasswordChangePanel.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                //PasswordChangePanel.Visibility = Visibility.Collapsed;
+            }
         }
 
         protected override void OnClosing(CancelEventArgs e)
@@ -119,6 +142,7 @@ namespace TaskyPad
                     _configService.SaveConfigJSON();
 
                     MigrateDataToEncrypt(listTareas);
+                    UpdatePasswordPanelVisibility();
                 }
                 else 
                 {
@@ -144,6 +168,7 @@ namespace TaskyPad
                         _configService._configuracion.passwordEncrypt = null;
                         _configService.SaveConfigJSON();
                         MigrateDataToEncrypt(listTareas);
+                        UpdatePasswordPanelVisibility();
                     }
                 }
             }

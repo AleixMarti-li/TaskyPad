@@ -17,6 +17,7 @@ namespace TaskyPad
         {
             _dataPath = LoadConfigPath();
             LoadConfigJSON();
+            _configuracion.ExecuteWinStart();
         }
 
         public void LoadConfigJSON()

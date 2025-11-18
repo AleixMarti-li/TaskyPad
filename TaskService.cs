@@ -207,7 +207,7 @@ namespace TaskyPad
             if (!Directory.Exists(folder))
                 Directory.CreateDirectory(folder);
 
-            return Path.Combine(folder, "tasks.json");
+            return Path.Combine(folder, "tasks.tpfile");
         }
 
         private void LoadTareasInternos()
@@ -247,6 +247,15 @@ namespace TaskyPad
                     _listaTareas = new List<Tarea>();
                     return;
                 }
+            }
+
+            bool isJson = conteindoJSON.TrimStart().StartsWith("{") || conteindoJSON.TrimStart().StartsWith("[");
+
+            if (!isJson && !EncryptEnabled) 
+            {
+                CustomMessageBox.ShowConfirmation(_mainWindow, "Error al descifrar las tareas. Es posible que la contraseña de cifrado sea incorrecta.", "Error de Descifrado", CustomMessageBoxButton.OK);
+                _listaTareas = new List<Tarea>();
+                return;
             }
 
             List<Tarea>? tareasRecuperadas = JsonSerializer.Deserialize<List<Tarea>>(conteindoJSON);

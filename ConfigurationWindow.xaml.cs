@@ -39,8 +39,6 @@ namespace TaskyPad
 
             CheckStartOnWindowsStart.IsChecked = _configService._configuracion.iniciarAuto;
             CheckEnableEncrypt.IsChecked = _configService._configuracion.enableEncrypt;
-            if (_configService._configuracion.enableEncrypt) TextBoxContrasena.Visibility = Visibility.Visible;
-            if (!string.IsNullOrEmpty(_configService._configuracion.passwordEncrypt)) TextBoxContrasena.Text = _configService._configuracion.passwordEncrypt;
         }
 
         protected override void OnClosing(CancelEventArgs e)
@@ -67,27 +65,102 @@ namespace TaskyPad
             bool? checkEnableEncrypt = CheckEnableEncrypt.IsChecked;
             if (checkEnableEncrypt.HasValue)
             {
-                _configService._configuracion.enableEncrypt = checkEnableEncrypt.Value;
-
                 if (checkEnableEncrypt.Value)
                 {
-                    TextBoxContrasena.Visibility = Visibility.Visible;
+                    CustomMessageBoxResult resultadoConfirmacion = CustomMessageBox.ShowConfirmation(this, "¿Estás seguro de activar el cifrado? Asegúrate de guardar una contraseña segura, ya que será necesaria para acceder a tus datos.", "Confirmar activar cifrado", CustomMessageBoxButton.OKCancel);
+                    if (resultadoConfirmacion is not CustomMessageBoxResult.OK) 
+                    {
+                        CheckEnableEncrypt.IsChecked = false;
+                        return;
+                    }
+
+                    string? customMessageBoxResultOldPassword = CustomMessageBox.ShowInput(this, "Por favor, ingresa la contraseña de encriptaje.", "Confirmar contraseña", "", "Contraseña");
+                    string? customMessageBoxResultOldPasswordConfirm = CustomMessageBox.ShowInput(this, "Por favor, ingresa nuevamente la contraseña de encriptaje para confirmarla.", "Confirmar contraseña", "", "Contraseña");
+
+                    if (customMessageBoxResultOldPassword is null || customMessageBoxResultOldPasswordConfirm is null || customMessageBoxResultOldPassword != customMessageBoxResultOldPasswordConfirm)
+                    {
+                        CustomMessageBox.ShowOkDialog(this, "Las contraseñas no coinciden. El cifrado no ha sido activado.", "Contraseñas no coinciden");
+                        CheckEnableEncrypt.IsChecked = false;
+                        return;
+                    }
+
+                    MigrateDataToDecrypt(out List<Tarea>? listTareas);
+
+                    _configService._configuracion.enableEncrypt = true;
+                    _configService._configuracion.passwordEncrypt = customMessageBoxResultOldPassword;
+                    _configService.SaveConfigJSON();
+
+                    MigrateDataToEncrypt(listTareas);
                 }
                 else 
                 {
-                    TextBoxContrasena.Visibility = Visibility.Hidden;
+                    if (_configService._configuracion.enableEncrypt)
+                    {
+                        CustomMessageBoxResult resultadoConfirmacion = CustomMessageBox.ShowConfirmation(this, "¿Estás seguro de desactivar el cifrado? Tus datos serán desencriptados y la contraseña guardada será eliminada.", "Confirmar desactivar cifrado", CustomMessageBoxButton.OKCancel);
+
+                        if (resultadoConfirmacion is not CustomMessageBoxResult.OK) return;
+
+                        if (_configService._configuracion.passwordEncrypt is not null && _configService._configuracion.passwordEncrypt != "")
+                        {
+                            string? customMessageBoxResultOldPassword = CustomMessageBox.ShowInput(this, "Por favor, ingresa la contraseña actual para confirmarla.", "Confirmar contraseña", "", "Contraseña");
+                            if (customMessageBoxResultOldPassword is null || customMessageBoxResultOldPassword != _configService._configuracion.passwordEncrypt)
+                            {
+                                CustomMessageBox.ShowOkDialog(this, "La contraseña no es correcta. El cifrado no ha sido desactivado.", "Contraseña incorrecta");
+                                CheckEnableEncrypt.IsChecked = true;
+                                return;
+                            }
+                        }
+
+                        MigrateDataToDecrypt(out List<Tarea>? listTareas);
+                        _configService._configuracion.enableEncrypt = false;
+                        _configService._configuracion.passwordEncrypt = null;
+                        _configService.SaveConfigJSON();
+                        MigrateDataToEncrypt(listTareas);
+                    }
                 }
             }
-
-            _configService.SaveConfigJSON();
         }
 
         private void BtnGuardarContra_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrEmpty(TextBoxContrasena.Text)) return;
-            string contrasena = TextBoxContrasena.Text;
+            CustomMessageBoxResult resultadoConfirmacion = CustomMessageBox.ShowConfirmation(this, "¿Estás seguro de guardar esta contraseña? Asegúrate de recordarla, ya que será necesaria para desencriptar tus datos.", "Confirmar guardar contraseña", CustomMessageBoxButton.OKCancel);
+            
+            if (_configService._configuracion.passwordEncrypt is not null && _configService._configuracion.passwordEncrypt != "")
+            {
+                string? customMessageBoxResultOldPassword = CustomMessageBox.ShowInput(this, "Por favor, ingresa la contraseña antigua para confirmarla.", "Confirmar contraseña", "", "Contraseña");
+                if (customMessageBoxResultOldPassword is null || customMessageBoxResultOldPassword != _configService._configuracion.passwordEncrypt)
+                {
+                    CustomMessageBox.ShowOkDialog(this, "La contraseña antigua no es correcta. La nueva contraseña no ha sido guardada.", "Contraseña incorrecta");
+                    return;
+                }
+            }
+
+            string? contrasena = CustomMessageBox.ShowInput(this, "Por favor, ingresa la nueva contraseña de encriptaje.", "Nueva contraseña", "", "Contraseña");
+            string? contrasenaConfirm = CustomMessageBox.ShowInput(this, "Por favor, ingresa nuevamente la nueva contraseña de encriptaje para confirmarla.", "Confirmar nueva contraseña", "", "Contraseña");
+
+            if (contrasena is null || contrasenaConfirm is null || contrasena != contrasenaConfirm)
+            {
+                CustomMessageBox.ShowOkDialog(this, "Las contraseñas no coinciden. La nueva contraseña no ha sido guardada.", "Contraseñas no coinciden");
+                return;
+            }
+
+            MigrateDataToDecrypt(out List<Tarea>? listTareas);
+
             _configService._configuracion.passwordEncrypt = contrasena;
             _configService.SaveConfigJSON();
+
+            MigrateDataToEncrypt(listTareas);
+        }
+
+        private void MigrateDataToDecrypt(out List<Tarea>? listTareas)
+        {
+            listTareas = _ventanaPrincipal.taskService.LoadTareas(_ventanaPrincipal);
+        }
+
+        private void MigrateDataToEncrypt(List<Tarea>? listTareas)
+        {
+            if (listTareas is null) return;
+            _ventanaPrincipal.taskService.SaveTareas(listTareas);
         }
     }
 }

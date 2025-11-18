@@ -40,7 +40,7 @@ namespace TaskyPad
         private UpdateManager updateManager;
         private returnMessageUpdateInfo _updateManagerResponse;
         private NotificationService notificationService;
-        private TaskService taskService;
+        public TaskService taskService;
         private ConfigService configService;
         
         // Drag and drop fields

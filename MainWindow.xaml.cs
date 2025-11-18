@@ -62,6 +62,12 @@ namespace TaskyPad
             LoadTareas();
 
             CheckVersion();
+            
+            // Si la aplicación se inició en modo silencioso, mostrar el ícono de la bandeja
+            if (App.HasArgument("-silent"))
+            {
+                _TrayIcon.Visible = true;
+            }
         }
         private NotificationService CreateNotificationService()
         {
@@ -135,7 +141,6 @@ namespace TaskyPad
                 this.ShowInTaskbar = true;
                 this.Activate();
             });
-            _TrayIcon.ContextMenuStrip = new Forms.ContextMenuStrip();
             _TrayIcon.ContextMenuStrip.Items.Add("Salir", null, (s, e) =>
             {
                 _TrayIcon.Visible = false;

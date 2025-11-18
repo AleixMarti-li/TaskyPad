@@ -18,10 +18,12 @@ namespace TaskyPad
     /// </summary>
     public partial class App : System.Windows.Application
     {
+        private static string[] _commandLineArgs = Array.Empty<string>();
 
         [STAThread]
         private static void Main(string[] args)
         {
+            _commandLineArgs = args;
             VelopackApp.Build().Run();
             App app = new();
             app.InitializeComponent();
@@ -53,6 +55,28 @@ namespace TaskyPad
                 // Si es la primera instancia, iniciamos el servidor de Named Pipe
                 IniciarServidorNamedPipe();
 
+                // Si se pasó el argumento -silent, no mostrar la ventana principal
+                if (HasArgument("-silent"))
+                {
+                    Debug.WriteLine("Aplicación iniciada en modo silencioso (-silent)");
+                    
+                    // Crear la MainWindow pero sin mostrarla
+                    MainWindow mainWindow = new MainWindow();
+                    mainWindow.Visibility = Visibility.Hidden;
+                    mainWindow.ShowInTaskbar = false;
+                    this.MainWindow = mainWindow;
+                }
+                else
+                {
+                    // Mostrar la MainWindow normalmente
+                    MainWindow mainWindow = new MainWindow();
+                    mainWindow.Show();
+                    this.MainWindow = mainWindow;
+                }
+
+                // Procesar otros argumentos de línea de comandos
+                ProcessCommandLineArguments();
+
                 // Registrar el manejador de activaciones de Toast notifications
                 ToastNotificationManagerCompat.OnActivated += ToastNotificationManagerCompat_OnActivated;
 
@@ -63,6 +87,69 @@ namespace TaskyPad
                 Debug.WriteLine($"Error en OnStartup: {ex.Message}");
                 System.Windows.MessageBox.Show($"Error al iniciar la aplicación: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 System.Windows.Application.Current.Shutdown();
+            }
+        }
+
+        /// <summary>
+        /// Recupera los argumentos de línea de comandos pasados a la aplicación.
+        /// </summary>
+        /// <returns>Array con los argumentos de línea de comandos.</returns>
+        public static string[] GetCommandLineArgs()
+        {
+            return _commandLineArgs ?? Array.Empty<string>();
+        }
+
+        /// <summary>
+        /// Verifica si un argumento específico está presente en los argumentos de línea de comandos.
+        /// </summary>
+        /// <param name="argumentName">Nombre del argumento a buscar (ej: "-silent", "--verbose")</param>
+        /// <returns>true si el argumento está presente, false en caso contrario.</returns>
+        public static bool HasArgument(string argumentName)
+        {
+            return GetCommandLineArgs().Any(arg => arg.Equals(argumentName, StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
+        /// Obtiene el valor de un argumento específico.
+        /// </summary>
+        /// <param name="argumentName">Nombre del argumento a buscar (ej: "-config", "--output")</param>
+        /// <param name="defaultValue">Valor por defecto si no se encuentra el argumento.</param>
+        /// <returns>El valor del argumento o el valor por defecto.</returns>
+        public static string? GetArgumentValue(string argumentName, string? defaultValue = null)
+        {
+            var args = GetCommandLineArgs();
+            for (int i = 0; i < args.Length; i++)
+            {
+                if (args[i].Equals(argumentName, StringComparison.OrdinalIgnoreCase))
+                {
+                    if (i + 1 < args.Length && !args[i + 1].StartsWith("-"))
+                    {
+                        return args[i + 1];
+                    }
+                }
+            }
+            return defaultValue;
+        }
+
+        /// <summary>
+        /// Procesa los argumentos de la aplicación y realiza las acciones correspondientes.
+        /// </summary>
+        private void ProcessCommandLineArguments()
+        {
+            try
+            {
+                // Otros argumentos pueden ser procesados aquí
+                string? config = GetArgumentValue("-config");
+                if (!string.IsNullOrEmpty(config))
+                {
+                    Debug.WriteLine($"Configuración especificada: {config}");
+                }
+
+                Debug.WriteLine($"Argumentos de línea de comandos: {string.Join(", ", GetCommandLineArgs())}");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error procesando argumentos de línea de comandos: {ex.Message}");
             }
         }
 

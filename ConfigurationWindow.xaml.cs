@@ -15,6 +15,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using TaskyPad.Services;
 
 namespace TaskyPad
 {
@@ -25,11 +26,14 @@ namespace TaskyPad
     {
         public MainWindow _ventanaPrincipal;
         public ConfigService _configService;
+        private AutoStartService _autoStartService;
+
         public ConfigurationWindow(MainWindow ventanaPrincipal, ConfigService configService)
         {
             InitializeComponent();
             _ventanaPrincipal = ventanaPrincipal;
             _configService = configService;
+            _autoStartService = new AutoStartService();
             LoadConfigUI();
         }
 
@@ -54,6 +58,30 @@ namespace TaskyPad
             if (checkStart.HasValue)
             {
                 _configService._configuracion.iniciarAuto = checkStart.Value;
+                
+                // Usar AutoStartService para gestionar el registro de Windows
+                if (checkStart.Value)
+                {
+                    bool success = _autoStartService.EnableAutoStart();
+                    if (!success)
+                    {
+                        CustomMessageBox.ShowOkDialog(this, "No se pudo habilitar el inicio automático. Verifica los permisos.", "Error");
+                        CheckStartOnWindowsStart.IsChecked = false;
+                        _configService._configuracion.iniciarAuto = false;
+                        return;
+                    }
+                }
+                else
+                {
+                    bool success = _autoStartService.DisableAutoStart();
+                    if (!success)
+                    {
+                        CustomMessageBox.ShowOkDialog(this, "No se pudo desactivar el inicio automático.", "Error");
+                        CheckStartOnWindowsStart.IsChecked = true;
+                        _configService._configuracion.iniciarAuto = true;
+                        return;
+                    }
+                }
             }
 
             _configService.SaveConfigJSON();

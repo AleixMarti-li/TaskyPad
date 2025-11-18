@@ -8,7 +8,6 @@
         Title="ConfigurationWindow" Height="450" Width="800">
     <Grid>
         <CheckBox x:Name="CheckStartOnWindowsStart" Content="Iniciar con inicio de sistema operativo" HorizontalAlignment="Left" Margin="166,156,0,0" VerticalAlignment="Top" Click="CheckStartOnWindowsStart_Click"/>
-        <Button x:Name="BtnExportOldData" Content="Exportar old data" HorizontalAlignment="Left" Margin="304,328,0,0" VerticalAlignment="Top"/>
         <CheckBox x:Name="CheckEnableEncrypt" Content="Habilitar encriptación" HorizontalAlignment="Left" Margin="212,119,0,0" VerticalAlignment="Top" Click="CheckEnableEncrypt_Click"/>
     </Grid>
 </Window>

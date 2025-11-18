@@ -267,10 +267,20 @@ namespace TaskyPad
             PanelTareasInProgress.Children.Clear();
             PanelTareasDone.Children.Clear();
 
-            // Setup drop targets
-            SetupDropPanel(PanelTareasNone, EstadoTarea.None);
-            SetupDropPanel(PanelTareasInProgress, EstadoTarea.InProgress);
-            SetupDropPanel(PanelTareasDone, EstadoTarea.Done);
+            // Find ScrollViewers and their parent Borders dynamically
+            ScrollViewer? scrollViewerNone = this.FindName("ScrollViewerTareasNone") as ScrollViewer;
+            ScrollViewer? scrollViewerInProgress = this.FindName("ScrollViewerTareasInProgress") as ScrollViewer;
+            ScrollViewer? scrollViewerDone = this.FindName("ScrollViewerTareasDone") as ScrollViewer;
+
+            // Setup drop targets on both ScrollViewer and StackPanel
+            // Primary target is ScrollViewer if it exists, fallback to StackPanel
+            UIElement targetNone = (UIElement?)scrollViewerNone ?? PanelTareasNone;
+            UIElement targetInProgress = (UIElement?)scrollViewerInProgress ?? PanelTareasInProgress;
+            UIElement targetDone = (UIElement?)scrollViewerDone ?? PanelTareasDone;
+
+            SetupDropTarget(targetNone, PanelTareasNone, EstadoTarea.None);
+            SetupDropTarget(targetInProgress, PanelTareasInProgress, EstadoTarea.InProgress);
+            SetupDropTarget(targetDone, PanelTareasDone, EstadoTarea.Done);
 
             var tareasDivididas = new
             {
@@ -540,7 +550,7 @@ namespace TaskyPad
             return (badge, dateText);
         }
 
-        private Button CreateActionButton(string content, System.Windows.Media.Color bgColor)
+        private Button CreateActionButton(String content, System.Windows.Media.Color bgColor)
         {
             return new Button
             {
@@ -604,12 +614,15 @@ namespace TaskyPad
             ventanaConfigruacion.ShowDialog();
         }
 
-        // Drag and Drop helper methods
-        private void SetupDropPanel(StackPanel panel, EstadoTarea targetStatus)
+        // Drag and Drop helper methods - Improved version
+        private void SetupDropTarget(UIElement scrollViewer, StackPanel panel, EstadoTarea targetStatus)
         {
+            // Enable drop on both the ScrollViewer and the StackPanel
+            scrollViewer.AllowDrop = true;
             panel.AllowDrop = true;
 
-            panel.DragEnter += (s, e) =>
+            // Handler para eventos de drop
+            System.Windows.DragEventHandler dragEnterHandler = (s, e) =>
             {
                 if (e.Data.GetDataPresent(System.Windows.DataFormats.Serializable))
                 {
@@ -622,7 +635,7 @@ namespace TaskyPad
                 e.Handled = true;
             };
 
-            panel.DragOver += (s, e) =>
+            System.Windows.DragEventHandler dragOverHandler = (s, e) =>
             {
                 if (e.Data.GetDataPresent(System.Windows.DataFormats.Serializable))
                 {
@@ -635,17 +648,32 @@ namespace TaskyPad
                 e.Handled = true;
             };
 
-            panel.Drop += (s, e) =>
+            System.Windows.DragEventHandler dropHandler = (s, e) =>
             {
-                if (e.Data.GetData(System.Windows.DataFormats.Serializable) is Tarea draggedTask)
-                {
-                    if (draggedTask.estado != targetStatus)
-                    {
-                        CambiarEstadoTarea(draggedTask, targetStatus);
-                    }
-                }
+                HandleDrop(e, targetStatus);
                 e.Handled = true;
             };
+
+            // ScrollViewer events
+            scrollViewer.DragEnter += dragEnterHandler;
+            scrollViewer.DragOver += dragOverHandler;
+            scrollViewer.Drop += dropHandler;
+
+            // StackPanel events
+            panel.DragEnter += dragEnterHandler;
+            panel.DragOver += dragOverHandler;
+            panel.Drop += dropHandler;
+        }
+
+        private void HandleDrop(System.Windows.DragEventArgs e, EstadoTarea targetStatus)
+        {
+            if (e.Data.GetData(System.Windows.DataFormats.Serializable) is Tarea draggedTask)
+            {
+                if (draggedTask.estado != targetStatus)
+                {
+                    CambiarEstadoTarea(draggedTask, targetStatus);
+                }
+            }
         }
     }
 }

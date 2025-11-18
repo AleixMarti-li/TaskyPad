@@ -13,7 +13,6 @@ namespace TaskyPad
         public string _dataPath;
         public Config _configuracion = new Config();
 
-
         public ConfigService() 
         {
             _dataPath = LoadConfigPath();

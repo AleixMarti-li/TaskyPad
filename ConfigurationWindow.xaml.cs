@@ -38,6 +38,9 @@ namespace TaskyPad
             if (_configService._configuracion is null) return;
 
             CheckStartOnWindowsStart.IsChecked = _configService._configuracion.iniciarAuto;
+            CheckEnableEncrypt.IsChecked = _configService._configuracion.enableEncrypt;
+            if (_configService._configuracion.enableEncrypt) TextBoxContrasena.Visibility = Visibility.Visible;
+            if (!string.IsNullOrEmpty(_configService._configuracion.passwordEncrypt)) TextBoxContrasena.Text = _configService._configuracion.passwordEncrypt;
         }
 
         protected override void OnClosing(CancelEventArgs e)
@@ -55,6 +58,35 @@ namespace TaskyPad
                 _configService._configuracion.iniciarAuto = checkStart.Value;
             }
 
+            _configService.SaveConfigJSON();
+        }
+
+        private void CheckEnableEncrypt_Click(object sender, RoutedEventArgs e)
+        {
+            if (_configService._configuracion is null) return;
+            bool? checkEnableEncrypt = CheckEnableEncrypt.IsChecked;
+            if (checkEnableEncrypt.HasValue)
+            {
+                _configService._configuracion.enableEncrypt = checkEnableEncrypt.Value;
+
+                if (checkEnableEncrypt.Value)
+                {
+                    TextBoxContrasena.Visibility = Visibility.Visible;
+                }
+                else 
+                {
+                    TextBoxContrasena.Visibility = Visibility.Hidden;
+                }
+            }
+
+            _configService.SaveConfigJSON();
+        }
+
+        private void BtnGuardarContra_Click(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrEmpty(TextBoxContrasena.Text)) return;
+            string contrasena = TextBoxContrasena.Text;
+            _configService._configuracion.passwordEncrypt = contrasena;
             _configService.SaveConfigJSON();
         }
     }

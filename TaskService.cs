@@ -207,7 +207,7 @@ namespace TaskyPad
             if (!Directory.Exists(folder))
                 Directory.CreateDirectory(folder);
 
-            return Path.Combine(folder, "tasks.tpfile");
+            return Path.Combine(folder, "tasks.tpf");
         }
 
         private void LoadTareasInternos()

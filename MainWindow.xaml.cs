@@ -48,6 +48,7 @@ namespace TaskyPad
         private Tarea? _draggedTask = null;
         private System.Windows.Point _dragStartPoint;
         private bool _isDragging = false;
+        private bool _isInitialized = false;
 
         public MainWindow()
         {
@@ -70,8 +71,8 @@ namespace TaskyPad
                 Log.Information("Creating NotificationService");
                 notificationService = CreateNotificationService();
                 
-                Log.Information("Loading UpdateManager response");
-                _updateManagerResponse = LoadUpdateManagerResponse().GetAwaiter().GetResult();
+                // Initialize with a default value, will be loaded asynchronously later
+                _updateManagerResponse = new returnMessageUpdateInfo(false);
                 
                 Log.Information("Creating TaskService");
                 taskService = CreateTaskService();
@@ -88,9 +89,6 @@ namespace TaskyPad
                 Log.Information("Loading tasks");
                 LoadTareas();
 
-                Log.Information("Checking for updates");
-                CheckVersion();
-                
                 // Check if application started in silent mode
                 bool isSilentMode = App.HasArgument("-silent");
                 Log.Information("Application started in silent mode: {IsSilentMode}", isSilentMode);
@@ -118,7 +116,7 @@ namespace TaskyPad
             }
         }
 
-        protected override void OnContentRendered(EventArgs e)
+        protected override async void OnContentRendered(EventArgs e)
         {
             Log.Information("MainWindow OnContentRendered called");
             Log.Information("Window rendered state:");
@@ -128,8 +126,37 @@ namespace TaskyPad
             Log.Information("  - IsLoaded: {IsLoaded}", this.IsLoaded);
             
             base.OnContentRendered(e);
+
+            // Perform async initialization after the window is rendered
+            if (!_isInitialized)
+            {
+                _isInitialized = true;
+                await InitializeAsync();
+            }
         }
 
+        private async Task InitializeAsync()
+        {
+            try
+            {
+                Log.Information("Starting async initialization");
+                
+                Log.Information("Loading UpdateManager response");
+                _updateManagerResponse = await LoadUpdateManagerResponse();
+                Log.Information("UpdateManager response loaded successfully");
+                
+                Log.Information("Checking for updates");
+                await CheckVersionAsync();
+                Log.Information("Update check completed");
+                
+                Log.Information("Async initialization completed successfully");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error during async initialization");
+            }
+        }
+        
         protected override void OnActivated(EventArgs e)
         {
             Log.Information("MainWindow activated");
@@ -824,7 +851,7 @@ namespace TaskyPad
             return await updateManager.CheckActualizacionDisponible();
         }
 
-        private async void CheckVersion()
+        private async Task CheckVersionAsync()
         {
             _updateManagerResponse = await updateManager.CheckActualizacionDisponible();
 

@@ -34,11 +34,17 @@ jobs:
             } else {
               core.setOutput('exists', 'false');
             }
-      - name: Check if Release Exists
+      - name: Cancel Workflow Update
         if: steps.get-github-version.outputs.exists == 'true'
-        run: |
-          echo "Release v${{ steps.get-version.outputs.version }} already exists. Exiting."
-          exit 0
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.actions.cancelWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId
+            })
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:

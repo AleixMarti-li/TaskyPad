@@ -18,6 +18,27 @@ jobs:
         id: get-version
         shell: bash
         run: echo "version=$(grep -oE '<AssemblyVersion>[^<]+' TaskyPad.csproj | sed 's/<AssemblyVersion>//')" >> $GITHUB_OUTPUT
+      - name: Get Version from Github Tags
+        id: get-github-version
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const tags = await github.rest.repos.listTags({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100,
+            });
+            const versionTag = tags.data.find(tag => tag.name === `v${{ steps.get-version.outputs.version }}`);
+            if (versionTag) {
+              core.setOutput('exists', 'true');
+            } else {
+              core.setOutput('exists', 'false');
+            }
+      - name: Check if Release Exists
+        if: steps.get-github-version.outputs.exists == 'true'
+        run: |
+          echo "Release v${{ steps.get-version.outputs.version }} already exists. Exiting."
+          exit 0
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:

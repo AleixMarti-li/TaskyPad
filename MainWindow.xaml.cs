@@ -27,6 +27,7 @@ using Forms = System.Windows.Forms;
 using Button = System.Windows.Controls.Button;
 using ComboBox = System.Windows.Controls.ComboBox;
 using Orientation = System.Windows.Controls.Orientation;
+using Serilog;
 
 namespace TaskyPad
 {
@@ -50,108 +51,223 @@ namespace TaskyPad
 
         public MainWindow()
         {
-            InitializeComponent();
-            updateManager = CreateUpdateManager();
-            configService = CreateConfigService();
-            notificationService = CreateNotificationService();
-            _updateManagerResponse = LoadUpdateManagerResponse().GetAwaiter().GetResult();
-            taskService = CreateTaskService();
-            _TrayIcon = loadTrayIcon();
-            AddVersionAppUI();
-            RecuperarNotas();
-            LoadTareas();
-
-            CheckVersion();
+            Log.Information("==================================================");
+            Log.Information("MainWindow constructor started");
+            Log.Information("==================================================");
             
-            // Si la aplicación se inició en modo silencioso, mostrar el ícono de la bandeja
-            if (App.HasArgument("-silent"))
+            try
             {
-                _TrayIcon.Visible = true;
+                Log.Information("Initializing WPF components");
+                InitializeComponent();
+                Log.Information("WPF components initialized successfully");
+
+                Log.Information("Creating UpdateManager");
+                updateManager = CreateUpdateManager();
+                
+                Log.Information("Creating ConfigService");
+                configService = CreateConfigService();
+                
+                Log.Information("Creating NotificationService");
+                notificationService = CreateNotificationService();
+                
+                Log.Information("Loading UpdateManager response");
+                _updateManagerResponse = LoadUpdateManagerResponse().GetAwaiter().GetResult();
+                
+                Log.Information("Creating TaskService");
+                taskService = CreateTaskService();
+                
+                Log.Information("Loading TrayIcon");
+                _TrayIcon = loadTrayIcon();
+                
+                Log.Information("Adding version to UI");
+                AddVersionAppUI();
+                
+                Log.Information("Loading notes");
+                RecuperarNotas();
+                
+                Log.Information("Loading tasks");
+                LoadTareas();
+
+                Log.Information("Checking for updates");
+                CheckVersion();
+                
+                // Check if application started in silent mode
+                bool isSilentMode = App.HasArgument("-silent");
+                Log.Information("Application started in silent mode: {IsSilentMode}", isSilentMode);
+                
+                if (isSilentMode)
+                {
+                    Log.Information("Silent mode detected - showing TrayIcon");
+                    _TrayIcon.Visible = true;
+                    Log.Information("TrayIcon visibility set to: {Visible}", _TrayIcon.Visible);
+                }
+                
+                // Log window state
+                Log.Information("MainWindow initial state:");
+                Log.Information("  - Visibility: {Visibility}", this.Visibility);
+                Log.Information("  - WindowState: {WindowState}", this.WindowState);
+                Log.Information("  - ShowInTaskbar: {ShowInTaskbar}", this.ShowInTaskbar);
+                Log.Information("  - IsVisible: {IsVisible}", this.IsVisible);
+                
+                Log.Information("MainWindow constructor completed successfully");
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Critical error in MainWindow constructor");
+                throw;
             }
         }
-        private NotificationService CreateNotificationService()
-        {
-            return new NotificationService();
-        }
-        private ConfigService CreateConfigService()
-        {
-            return new ConfigService();
-        }
 
-        private UpdateManager CreateUpdateManager()
+        protected override void OnContentRendered(EventArgs e)
         {
-            return new UpdateManager();
-        }
-
-        private TaskService CreateTaskService()
-        {
-            TaskService _taskService = new TaskService(this, notificationService, configService);
-            _taskService.InicializeTimers();
-            return _taskService;
+            Log.Information("MainWindow OnContentRendered called");
+            Log.Information("Window rendered state:");
+            Log.Information("  - ActualWidth: {Width}", this.ActualWidth);
+            Log.Information("  - ActualHeight: {Height}", this.ActualHeight);
+            Log.Information("  - WindowState: {WindowState}", this.WindowState);
+            Log.Information("  - IsLoaded: {IsLoaded}", this.IsLoaded);
+            
+            base.OnContentRendered(e);
         }
 
-        private async Task<returnMessageUpdateInfo> LoadUpdateManagerResponse()
+        protected override void OnActivated(EventArgs e)
         {
-            return await updateManager.CheckActualizacionDisponible();
+            Log.Information("MainWindow activated");
+            Log.Information("  - WindowState: {WindowState}", this.WindowState);
+            Log.Information("  - Topmost: {Topmost}", this.Topmost);
+            
+            base.OnActivated(e);
         }
 
-        private async void CheckVersion()
+        protected override void OnDeactivated(EventArgs e)
         {
-            _updateManagerResponse = await updateManager.CheckActualizacionDisponible();
-
-            if (!_updateManagerResponse.updateAvaliable) return;
-
-            ButtonUpdateVersion.Visibility = Visibility.Visible;
-            ButtonUpdateVersion.Content = $"Descargar actualización ({_updateManagerResponse.version})";
-            //CustomMessageBoxResult eliminarNota = CustomMessageBox.Show(this, $"¿Seguro que quieras actualizar al a versión {_updateManagerResponse.version}?", $"Actualización {_updateManagerResponse.version}", CustomMessageBoxButton.YesNo, iconPath: "pack://application:,,,/Resources/warn.jpg", headerLogoPath: "pack://application:,,,/Resources/warn.jpg");
-            //if (eliminarNota != CustomMessageBoxResult.Yes) return;
+            Log.Information("MainWindow deactivated");
+            base.OnDeactivated(e);
         }
-        private async void ButtonUpdateVersion_Click(object sender, RoutedEventArgs e)
+
+        protected override void OnStateChanged(EventArgs e)
         {
-            CustomMessageBoxResult eliminarNota = CustomMessageBox.ShowConfirmation(this, $"¿Estás completamente seguro de que deseas actualizar a la versión v({_updateManagerResponse.version})? \n\nEsta acción reemplazará la versión que estás usando ahora mismo y aplicará todos los cambios incluidos en la nueva actualización.", $"Actualizar a la versión v{_updateManagerResponse.version}", CustomMessageBoxButton.YesNo, iconPath: "pack://application:,,,/Resources/cloudUpdate.png", headerLogoPath: "pack://application:,,,/Resources/logo.ico");
-            if (eliminarNota != CustomMessageBoxResult.Yes) return;
-            ButtonUpdateVersion.IsEnabled = false;
-            ButtonUpdateVersion.Content = "Descargando actualización...";
-            await updateManager.ForceUpdate();
-            ButtonUpdateVersion.IsEnabled = true;
-            ButtonUpdateVersion.Content = $"Descargar actualización ({_updateManagerResponse.version})";
+            Log.Information("MainWindow state changed to: {WindowState}", this.WindowState);
+            
+            if (this.WindowState == WindowState.Minimized)
+            {
+                Log.Information("Window minimized - considering hiding to tray");
+            }
+            else if (this.WindowState == WindowState.Normal)
+            {
+                Log.Information("Window restored to normal state");
+            }
+            else if (this.WindowState == WindowState.Maximized)
+            {
+                Log.Information("Window maximized");
+            }
+            
+            base.OnStateChanged(e);
         }
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
+            Log.Information("MainWindow OnClosing event triggered");
+            Log.Information("  - Build configuration: {BuildConfig}", 
+#if DEBUG
+                "DEBUG"
+#else
+                "RELEASE"
+#endif
+            );
+            
 #if !DEBUG
+            Log.Information("Release mode - cancelling close and hiding to tray");
             e.Cancel = true;
             this.Hide();
             this.ShowInTaskbar = false;
             _TrayIcon.Visible = true;
+            
+            Log.Information("Window hidden - new state:");
+            Log.Information("  - Visibility: {Visibility}", this.Visibility);
+            Log.Information("  - ShowInTaskbar: {ShowInTaskbar}", this.ShowInTaskbar);
+            Log.Information("  - TrayIcon.Visible: {TrayIconVisible}", _TrayIcon?.Visible);
+#else
+            Log.Information("Debug mode - allowing window to close");
 #endif
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            Log.Information("MainWindow OnClosed event - window fully closed");
+            base.OnClosed(e);
         }
 
         private Forms.NotifyIcon loadTrayIcon() 
         {
+            Log.Information("Creating TrayIcon");
+            
             Forms.NotifyIcon _TrayIcon = new Forms.NotifyIcon();
             _TrayIcon.Visible = false;
             _TrayIcon.Text = "TaskyPad";
-            _TrayIcon.Icon = new Icon("Resources\\logo.ico");
+            
+            try
+            {
+                _TrayIcon.Icon = new Icon("Resources\\logo.ico");
+                Log.Information("TrayIcon icon loaded successfully from: Resources\\logo.ico");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to load TrayIcon icon");
+            }
+            
             _TrayIcon.ContextMenuStrip = new Forms.ContextMenuStrip();
+            
+            // Add "Open" menu item
             _TrayIcon.ContextMenuStrip.Items.Add("Abrir", null, (s, e) =>
             {
+                Log.Information("TrayIcon 'Abrir' clicked - restoring window");
+                Log.Information("Current window state before restore:");
+                Log.Information("  - Visibility: {Visibility}", this.Visibility);
+                Log.Information("  - WindowState: {WindowState}", this.WindowState);
+                Log.Information("  - ShowInTaskbar: {ShowInTaskbar}", this.ShowInTaskbar);
+                
                 this.Show();
                 this.WindowState = WindowState.Normal;
                 this.ShowInTaskbar = true;
                 this.Activate();
+                
+                Log.Information("Window restored - new state:");
+                Log.Information("  - Visibility: {Visibility}", this.Visibility);
+                Log.Information("  - WindowState: {WindowState}", this.WindowState);
+                Log.Information("  - ShowInTaskbar: {ShowInTaskbar}", this.ShowInTaskbar);
+                Log.Information("  - IsActive: {IsActive}", this.IsActive);
             });
+            
+            // Add "Exit" menu item
             _TrayIcon.ContextMenuStrip.Items.Add("Salir", null, (s, e) =>
             {
+                Log.Information("TrayIcon 'Salir' clicked - shutting down application");
                 _TrayIcon.Visible = false;
+                Log.Information("TrayIcon hidden, initiating application shutdown");
                 System.Windows.Application.Current.Shutdown();
             });
+            
+            // Double-click handler
             _TrayIcon.DoubleClick += (s, e) =>
             {
+                Log.Information("TrayIcon double-clicked - restoring window");
+                Log.Information("Current window state before restore:");
+                Log.Information("  - Visibility: {Visibility}", this.Visibility);
+                Log.Information("  - WindowState: {WindowState}", this.WindowState);
+                
                 this.Show();
                 this.WindowState = WindowState.Normal;
+                
+                Log.Information("Window restored via double-click - new state:");
+                Log.Information("  - Visibility: {Visibility}", this.Visibility);
+                Log.Information("  - WindowState: {WindowState}", this.WindowState);
             };
 
+            Log.Information("TrayIcon created successfully");
+            Log.Information("  - Initial Visibility: {Visible}", _TrayIcon.Visible);
+            Log.Information("  - Text: {Text}", _TrayIcon.Text);
+            
             return _TrayIcon;
         }
 
@@ -679,6 +795,54 @@ namespace TaskyPad
                     CambiarEstadoTarea(draggedTask, targetStatus);
                 }
             }
+        }
+
+        private NotificationService CreateNotificationService()
+        {
+            return new NotificationService();
+        }
+        
+        private ConfigService CreateConfigService()
+        {
+            return new ConfigService();
+        }
+
+        private UpdateManager CreateUpdateManager()
+        {
+            return new UpdateManager();
+        }
+
+        private TaskService CreateTaskService()
+        {
+            TaskService _taskService = new TaskService(this, notificationService, configService);
+            _taskService.InicializeTimers();
+            return _taskService;
+        }
+
+        private async Task<returnMessageUpdateInfo> LoadUpdateManagerResponse()
+        {
+            return await updateManager.CheckActualizacionDisponible();
+        }
+
+        private async void CheckVersion()
+        {
+            _updateManagerResponse = await updateManager.CheckActualizacionDisponible();
+
+            if (!_updateManagerResponse.updateAvaliable) return;
+
+            ButtonUpdateVersion.Visibility = Visibility.Visible;
+            ButtonUpdateVersion.Content = $"Descargar actualización ({_updateManagerResponse.version})";
+        }
+        
+        private async void ButtonUpdateVersion_Click(object sender, RoutedEventArgs e)
+        {
+            CustomMessageBoxResult eliminarNota = CustomMessageBox.ShowConfirmation(this, $"¿Estás completamente seguro de que deseas actualizar a la versión v({_updateManagerResponse.version})? \n\nEsta acción reemplazará la versión que estás usando ahora mismo y aplicará todos los cambios incluidos en la nueva actualización.", $"Actualizar a la versión v{_updateManagerResponse.version}", CustomMessageBoxButton.YesNo, iconPath: "pack://application:,,,/Resources/cloudUpdate.png", headerLogoPath: "pack://application:,,,/Resources/logo.ico");
+            if (eliminarNota != CustomMessageBoxResult.Yes) return;
+            ButtonUpdateVersion.IsEnabled = false;
+            ButtonUpdateVersion.Content = "Descargando actualización...";
+            await updateManager.ForceUpdate();
+            ButtonUpdateVersion.IsEnabled = true;
+            ButtonUpdateVersion.Content = $"Descargar actualización ({_updateManagerResponse.version})";
         }
     }
 }

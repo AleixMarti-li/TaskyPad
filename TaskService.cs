@@ -301,8 +301,8 @@ namespace TaskyPad
                 }
             }
 
-            if (!Directory.Exists("tareas")) Directory.CreateDirectory("tareas");
-            if (!File.Exists(LoadTareasPath()))
+            string TareasFilePath = LoadTareasPath();
+            if (!File.Exists(TareasFilePath))
             {
                 using (File.Create(LoadTareasPath())) { }
                 Log.Information("Tasks file did not exist, created new empty file");
@@ -360,7 +360,6 @@ namespace TaskyPad
         {
             Log.Information("Saving {TaskCount} tasks to file", tareas.Count);
             
-            if (!Directory.Exists("tareas")) Directory.CreateDirectory("tareas");
             if (!File.Exists(LoadTareasPath()))
             {
                 using (File.Create(LoadTareasPath())) { }

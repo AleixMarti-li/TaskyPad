@@ -300,30 +300,34 @@ namespace TaskyPad
 
         private void BtnCrearNotas_Click(object sender, RoutedEventArgs e)
         {
-            if (!Directory.Exists("notas")) {
-                Directory.CreateDirectory("notas");
-            }
-
             string? nombreNota = CustomMessageBox.ShowInput(this, "Introduce el nombre de la nota", "Ingreso de datos", headerLogoPath: "pack://application:,,,/Resources/logo.ico");
             if (string.IsNullOrEmpty(nombreNota)) return;
-            File.WriteAllText($"notas\\{nombreNota}.txt", @"{\rtf1\ansi }");
+            File.WriteAllText($"{LoadNotasPath()}\\{nombreNota}.tpn", @"{\rtf1\ansi }");
             RecuperarNotas();
         }
 
+        public string LoadNotasPath()
+        {
+            string folder = System.IO.Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "TaskyPad",
+                "Notes"
+            );
+            if (!Directory.Exists(folder))
+                Directory.CreateDirectory(folder);
+
+            return System.IO.Path.Combine(folder);
+        }
+
         public void RecuperarNotas() {
-            if (!Directory.Exists("notas")) {
-                Directory.CreateDirectory("notas");
-            }
-            string[] listaNotas = Directory.GetFiles("notas", "*.txt");
+            string[] listaNotas = Directory.GetFiles(LoadNotasPath(), "*.tpn");
             _listaNotas = listaNotas;
             RecuperarNotasUI();
         }
 
         private void RecuperarNotasUI()
         {
-            if (!Directory.Exists("notas")) Directory.CreateDirectory("notas");
-
-            _listaNotas = Directory.GetFiles("notas", "*.txt");
+            _listaNotas = Directory.GetFiles(LoadNotasPath(), "*.tpn");
 
             PanelNotas.Children.Clear();
 

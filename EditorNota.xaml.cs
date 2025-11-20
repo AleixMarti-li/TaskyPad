@@ -39,7 +39,7 @@ namespace TaskyPad
         {
             var eliminarNota = CustomMessageBox.ShowConfirmation(this, "¿Quieres eliminar este archivo?", "Confirma que deseas proceder con la eliminación.", CustomMessageBoxButton.YesNo, iconPath: "pack://application:,,,/Resources/trash.png", headerLogoPath: "pack://application:,,,/Resources/logo.ico");
             if (eliminarNota != CustomMessageBoxResult.Yes) return;
-            string path = $"notas/{_nombreNota}.txt";
+            string path = $"{_ventanaPrincipal.LoadNotasPath()}/{_nombreNota}.tpn";
             File.Delete(path);
             _ventanaPrincipal.RecuperarNotas();
             this.Close();
@@ -48,7 +48,7 @@ namespace TaskyPad
         private void BtnGuardar(object sender, RoutedEventArgs e)
         {
             TextRange texto = new TextRange(NotaTextBox.Document.ContentStart, NotaTextBox.Document.ContentEnd);
-            using (FileStream fs = new FileStream($"notas/{_nombreNota}.txt", FileMode.Create))
+            using (FileStream fs = new FileStream($"{_ventanaPrincipal.LoadNotasPath()}/{_nombreNota}.tpn", FileMode.Create))
             {
                 texto.Save(fs, System.Windows.Forms.DataFormats.Rtf);
             }
@@ -59,7 +59,7 @@ namespace TaskyPad
         {
 
             TextRange texto = new TextRange(NotaTextBox.Document.ContentStart, NotaTextBox.Document.ContentEnd);
-            using (FileStream fs = new FileStream($"notas/{_nombreNota}.txt", FileMode.Open))
+            using (FileStream fs = new FileStream($"{_ventanaPrincipal.LoadNotasPath()}/{_nombreNota}.tpn", FileMode.Open))
             {
                 texto.Load(fs, System.Windows.Forms.DataFormats.Rtf);
             }
